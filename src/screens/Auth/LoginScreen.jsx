@@ -226,21 +226,21 @@ export default function LoginScreen() {
 }
 
 const S = {
-    banner: { backgroundColor: C.navy, padding: '28px 20px 28px', position: 'relative', overflow: 'hidden' },
-    bannerRing1: { position: 'absolute', width: 260, height: 260, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.05)', top: -80, right: -60 },
-    bannerRing2: { position: 'absolute', width: 160, height: 160, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.06)', bottom: -50, left: -50 },
-    bannerContent: { maxWidth: '100%', margin: '0 auto', display: 'flex', alignItems: 'center', gap: 16, position: 'relative', zIndex: 1, flexWrap: 'wrap' },
-    bannerEmblem:  { width: 52, height: 52, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.14)', display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 },
-    bannerTitle:   { fontSize: 22, fontWeight: '800', color: '#fff', margin: '0 0 3px' },
+    banner: { background: 'linear-gradient(135deg, #0D1B35 0%, #0F1F3D 100%)', padding: '28px 24px', position: 'relative', overflow: 'hidden' },
+    bannerRing1: { position: 'absolute', width: 300, height: 300, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.05)', top: -100, right: -80 },
+    bannerRing2: { position: 'absolute', width: 180, height: 180, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.06)', bottom: -60, left: -60 },
+    bannerContent: { maxWidth: 560, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 16, position: 'relative', zIndex: 1, flexWrap: 'wrap' },
+    bannerEmblem:  { width: 54, height: 54, borderRadius: 16, background: 'linear-gradient(135deg, rgba(30,79,216,0.5) 0%, rgba(255,255,255,0.08) 100%)', border: '1px solid rgba(255,255,255,0.18)', display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0, boxShadow: '0 4px 12px rgba(30,79,216,0.3)' },
+    bannerTitle:   { fontSize: 24, fontWeight: '800', color: '#fff', margin: '0 0 3px', letterSpacing: '-0.3px' },
     bannerSub:     { fontSize: 12, color: 'rgba(255,255,255,0.5)', margin: 0 },
     secureBadge:   { marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 7, backgroundColor: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.11)', padding: '6px 12px', borderRadius: 20 },
-    secureDot:     { width: 6, height: 6, borderRadius: 3, backgroundColor: '#4ADE80' },
+    secureDot:     { width: 7, height: 7, borderRadius: 4, backgroundColor: '#4ADE80', boxShadow: '0 0 6px rgba(74,222,128,0.5)' },
     secureText:    { fontSize: 11, color: 'rgba(255,255,255,0.7)', fontWeight: '600' },
 
-    pageBody:  { maxWidth: '100%', margin: '0 auto', padding: '32px 20px 40px' },
-    card:      { backgroundColor: C.surface, borderRadius: 20, padding: '32px 28px', boxShadow: '0 4px 24px rgba(15,31,61,0.08)', border: `1px solid ${C.border}`, marginBottom: 20 },
-    cardTitle: { fontSize: 24, fontWeight: '800', color: C.text, margin: '0 0 4px' },
-    cardSub:   { fontSize: 14, color: C.muted, marginBottom: 28 },
+    pageBody:  { maxWidth: 560, margin: '0 auto', padding: '36px 20px 48px' },
+    card:      { backgroundColor: C.surface, borderRadius: 22, padding: '36px 32px', boxShadow: '0 8px 32px rgba(15,31,61,0.1)', border: `1px solid ${C.border}`, marginBottom: 20 },
+    cardTitle: { fontSize: 26, fontWeight: '800', color: C.text, margin: '0 0 5px', letterSpacing: '-0.3px' },
+    cardSub:   { fontSize: 14, color: C.muted, marginBottom: 30 },
 
     fieldWrap: { marginBottom: 18 },
     label:     { display: 'block', fontSize: 10, fontWeight: '700', color: C.muted, letterSpacing: 1.2, marginBottom: 8 },
@@ -259,9 +259,9 @@ const S = {
     remLabel:  { fontSize: 13, color: C.muted },
     forgotText:{ fontSize: 13, color: C.accent, fontWeight: '600', background: 'none', border: 'none', cursor: 'pointer' },
 
-    submitBtn:     { display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: C.navy, borderRadius: 12, padding: '15px', border: 'none', width: '100%', cursor: 'pointer', marginBottom: 24, boxShadow: '0 6px 14px rgba(15,31,61,0.25)' },
+    submitBtn:     { display: 'flex', justifyContent: 'center', alignItems: 'center', background: 'linear-gradient(135deg, #0F1F3D 0%, #1E3A5F 100%)', borderRadius: 14, padding: '16px', border: 'none', width: '100%', cursor: 'pointer', marginBottom: 24, boxShadow: '0 6px 18px rgba(15,31,61,0.3)', transition: 'opacity 0.15s, transform 0.15s' },
     submitDisabled:{ opacity: 0.6, cursor: 'not-allowed' },
-    submitText:    { color: '#fff', fontSize: 15, fontWeight: '700' },
+    submitText:    { color: '#fff', fontSize: 15, fontWeight: '700', letterSpacing: '0.2px' },
     spinner:       { width: 18, height: 18, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.8s linear infinite' },
 
     divider:  { display: 'flex', alignItems: 'center', marginBottom: 18 },

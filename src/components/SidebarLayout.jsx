@@ -385,7 +385,7 @@ export default function SidebarLayout({ children, unreadCount = 0, user }) {
 // ─── Sidebar styles ───────────────────────────────────────────────────────
 const sb = {
     sidebar: {
-        backgroundColor: C.navy,
+        background: 'linear-gradient(180deg, #0D1B35 0%, #0F1F3D 60%, #0F1F3D 100%)',
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
@@ -393,48 +393,53 @@ const sb = {
         overflowY: 'auto',
         scrollbarWidth: 'none',
         flexShrink: 0,
+        boxShadow: '2px 0 12px rgba(0,0,0,0.18)',
     },
     brand: {
         display: 'flex', alignItems: 'center', gap: 10,
-        padding: '18px 14px 14px',
+        padding: '20px 14px 16px',
         borderBottom: '1px solid rgba(255,255,255,0.07)',
         flexShrink: 0,
+        background: 'linear-gradient(135deg, rgba(30,79,216,0.12) 0%, transparent 100%)',
     },
     brandIcon: {
-        width: 38, height: 38, borderRadius: 11,
-        backgroundColor: 'rgba(255,255,255,0.08)',
-        border: '1px solid rgba(255,255,255,0.12)',
+        width: 40, height: 40, borderRadius: 12,
+        background: 'linear-gradient(135deg, rgba(30,79,216,0.5) 0%, rgba(255,255,255,0.1) 100%)',
+        border: '1px solid rgba(255,255,255,0.18)',
         display: 'flex', justifyContent: 'center', alignItems: 'center',
         flexShrink: 0,
+        boxShadow: '0 2px 8px rgba(30,79,216,0.3)',
     },
     brandTitle: { fontSize: 15, fontWeight: '800', color: '#fff', letterSpacing: '0.4px' },
-    brandSub:   { fontSize: 9,  fontWeight: '600', color: 'rgba(255,255,255,0.35)', letterSpacing: '0.5px', marginTop: 1 },
+    brandSub:   { fontSize: 9,  fontWeight: '600', color: 'rgba(255,255,255,0.4)', letterSpacing: '0.8px', marginTop: 1, textTransform: 'uppercase' },
 
     userCard: {
         display: 'flex', alignItems: 'center', gap: 10,
-        padding: '10px 14px',
+        padding: '12px 14px',
         backgroundColor: 'rgba(255,255,255,0.04)',
-        borderBottom: '1px solid rgba(255,255,255,0.07)',
+        borderBottom: '1px solid rgba(255,255,255,0.06)',
     },
     userAvatar: {
         width: 38, height: 38, borderRadius: 11,
-        backgroundColor: C.accent,
+        background: 'linear-gradient(135deg, #1E4FD8 0%, #3B82F6 100%)',
         display: 'flex', justifyContent: 'center', alignItems: 'center',
         flexShrink: 0, position: 'relative',
+        boxShadow: '0 2px 8px rgba(30,79,216,0.4)',
     },
     userAvatarText: { fontSize: 14, fontWeight: '800', color: '#fff' },
     userDot: {
         position: 'absolute', bottom: -2, right: -2,
         width: 10, height: 10, borderRadius: 5,
-        border: `2px solid ${C.navy}`,
+        border: `2px solid #0F1F3D`,
     },
     userName: { fontSize: 13, fontWeight: '700', color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
-    userRole: { fontSize: 10, color: 'rgba(255,255,255,0.38)', marginTop: 1 },
+    userRole: { fontSize: 10, color: 'rgba(255,255,255,0.4)', marginTop: 1, fontWeight: '500', letterSpacing: '0.3px' },
 
     navSection: {
-        fontSize: 9, fontWeight: '700', letterSpacing: '1.3px',
-        color: 'rgba(255,255,255,0.28)',
-        padding: '14px 16px 5px',
+        fontSize: 9, fontWeight: '700', letterSpacing: '1.6px',
+        color: 'rgba(255,255,255,0.25)',
+        padding: '16px 16px 6px',
+        textTransform: 'uppercase',
     },
 
     navBtn: {
@@ -443,14 +448,18 @@ const sb = {
         border: 'none', backgroundColor: 'transparent',
         cursor: 'pointer', marginBottom: 2,
         textAlign: 'left',
-        transition: 'background 0.12s ease',
+        transition: 'background 0.15s ease',
+        position: 'relative',
     },
     navBtnCollapsed: {
-        justifyContent: 'center', padding: '11px 0',
+        justifyContent: 'center', padding: '12px 0',
         borderRadius: 0, marginBottom: 0,
     },
-    navBtnActive: { backgroundColor: C.accent },
-    navLabel:     { fontSize: 13, fontWeight: '600', flex: 1 },
+    navBtnActive: {
+        background: 'linear-gradient(90deg, rgba(30,79,216,0.9) 0%, rgba(30,79,216,0.7) 100%)',
+        boxShadow: '0 2px 8px rgba(30,79,216,0.3)',
+    },
+    navLabel:     { fontSize: 13, fontWeight: '600', flex: 1, letterSpacing: '0.1px' },
     badge: {
         position: 'absolute', top: -5, right: -8,
         minWidth: 15, height: 15, borderRadius: 8,
@@ -458,27 +467,31 @@ const sb = {
         fontSize: 9, fontWeight: '800', color: '#fff',
         display: 'flex', justifyContent: 'center', alignItems: 'center',
         padding: '0 3px',
+        boxShadow: '0 1px 4px rgba(239,68,68,0.5)',
     },
     countPill: {
         marginLeft: 'auto', backgroundColor: '#EF4444',
         color: '#fff', fontSize: 10, fontWeight: '800',
-        padding: '2px 6px', borderRadius: 10,
+        padding: '2px 7px', borderRadius: 10,
+        boxShadow: '0 1px 4px rgba(239,68,68,0.4)',
     },
 
-    logoutWrap: { padding: '6px 10px 10px', borderTop: '1px solid rgba(255,255,255,0.07)' },
+    logoutWrap: { padding: '8px 10px 12px', borderTop: '1px solid rgba(255,255,255,0.07)' },
     logoutBtn: {
         width: '100%', display: 'flex', alignItems: 'center', gap: 11,
         padding: '10px 12px', borderRadius: 10,
-        border: 'none', backgroundColor: 'rgba(220,38,38,0.08)',
+        border: 'none', backgroundColor: 'rgba(220,38,38,0.07)',
         cursor: 'pointer',
+        transition: 'background 0.15s ease',
     },
-    logoutText: { fontSize: 13, fontWeight: '600', color: 'rgba(220,38,38,0.75)' },
+    logoutText: { fontSize: 13, fontWeight: '600', color: 'rgba(220,38,38,0.8)' },
 
     mobileTopBar: {
-        height: 56, backgroundColor: C.navy,
+        height: 58,
+        background: 'linear-gradient(90deg, #0D1B35 0%, #0F1F3D 100%)',
         display: 'flex', alignItems: 'center',
         padding: '0 16px', gap: 12,
-        boxShadow: '0 2px 8px rgba(15,31,61,0.2)',
+        boxShadow: '0 2px 12px rgba(15,31,61,0.3)',
         flexShrink: 0,
     },
     mobileIconBtn: {
@@ -487,7 +500,7 @@ const sb = {
         position: 'relative',
     },
     mobileBrand: { flex: 1, display: 'flex', alignItems: 'center' },
-    mobileBrandText: { fontSize: 16, fontWeight: '800', color: '#fff', letterSpacing: '0.2px' },
+    mobileBrandText: { fontSize: 16, fontWeight: '800', color: '#fff', letterSpacing: '0.3px' },
     mobileBadge: {
         position: 'absolute', top: 0, right: 0,
         minWidth: 15, height: 15, borderRadius: 8,
@@ -495,6 +508,7 @@ const sb = {
         fontSize: 9, fontWeight: '800', color: '#fff',
         display: 'flex', justifyContent: 'center', alignItems: 'center',
         padding: '0 2px',
+        boxShadow: '0 1px 4px rgba(239,68,68,0.5)',
     },
 
     drawerClose: {

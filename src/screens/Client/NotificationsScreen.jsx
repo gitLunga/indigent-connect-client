@@ -313,21 +313,22 @@ const S = {
     header: {
         backgroundColor: C.surface,
         borderBottom: `1px solid ${C.border}`,
-        padding: '18px 24px',
+        padding: '18px 28px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16,
         position: 'sticky', top: 0, zIndex: 50, flexWrap: 'wrap',
+        boxShadow: '0 1px 4px rgba(15,31,61,0.06)',
     },
     headerLeft:  { display: 'flex', alignItems: 'center', gap: 14 },
-    headerIcon:  { width: 42, height: 42, borderRadius: 12, backgroundColor: C.accentSoft, display: 'flex', justifyContent: 'center', alignItems: 'center' },
-    headerTitle: { fontSize: 19, fontWeight: '800', color: C.text, margin: 0 },
+    headerIcon:  { width: 44, height: 44, borderRadius: 13, background: 'linear-gradient(135deg, #EBF0FF 0%, #D4E0FF 100%)', display: 'flex', justifyContent: 'center', alignItems: 'center' },
+    headerTitle: { fontSize: 20, fontWeight: '800', color: C.text, margin: 0, letterSpacing: '-0.2px' },
     headerSub:   { fontSize: 12, color: C.muted, marginTop: 2 },
     headerRight: { display: 'flex', alignItems: 'center', gap: 10 },
 
-    markAllBtn:  { display: 'flex', alignItems: 'center', gap: 6, backgroundColor: C.accentSoft, padding: '7px 14px', borderRadius: 20, border: 'none', cursor: 'pointer' },
+    markAllBtn:  { display: 'flex', alignItems: 'center', gap: 6, backgroundColor: C.accentSoft, padding: '8px 16px', borderRadius: 22, border: 'none', cursor: 'pointer', boxShadow: '0 1px 4px rgba(30,79,216,0.12)' },
     markAllText: { fontSize: 13, color: C.accent, fontWeight: '700' },
-    iconBtn:     { width: 36, height: 36, borderRadius: 10, backgroundColor: C.bg, border: `1px solid ${C.border}`, display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer' },
+    iconBtn:     { width: 38, height: 38, borderRadius: 10, backgroundColor: C.bg, border: `1px solid ${C.border}`, display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer' },
 
-    body: { flex: 1, padding: '16px 24px 32px', maxWidth: '100%', width: '100%', alignSelf: 'center', boxSizing: 'border-box' },
+    body: { flex: 1, padding: '18px 28px 40px', maxWidth: 900, width: '100%', alignSelf: 'center', boxSizing: 'border-box' },
 
     list: { display: 'flex', flexDirection: 'column', gap: 8 },
 

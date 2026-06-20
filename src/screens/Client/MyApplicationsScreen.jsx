@@ -182,6 +182,7 @@ export default function MyApplicationsScreen() {
         return (
             <div
                 key={item.application_id}
+                className="card-hover"
                 style={S.appCard}
                 onClick={() => navigate(`/application-details/${item.application_id}`)}
             >
@@ -347,26 +348,26 @@ const S = {
     root:   { backgroundColor: C.bg, minHeight: '100%', display: 'flex', flexDirection: 'column' },
     center: { flex: 1, minHeight: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: C.bg },
 
-    pageHeader:     { backgroundColor: C.surface, borderBottom: `1px solid ${C.border}`, padding: '18px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap', position: 'sticky', top: 0, zIndex: 50 },
+    pageHeader:     { backgroundColor: C.surface, borderBottom: `1px solid ${C.border}`, padding: '18px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap', position: 'sticky', top: 0, zIndex: 50, boxShadow: '0 1px 4px rgba(15,31,61,0.06)' },
     pageHeaderLeft: { display: 'flex', alignItems: 'center', gap: 14 },
-    pageHeaderIcon: { width: 42, height: 42, borderRadius: 12, backgroundColor: C.accentSoft, display: 'flex', justifyContent: 'center', alignItems: 'center' },
-    pageTitle:      { fontSize: 19, fontWeight: '800', color: C.text, margin: 0 },
+    pageHeaderIcon: { width: 44, height: 44, borderRadius: 13, background: 'linear-gradient(135deg, #EBF0FF 0%, #D4E0FF 100%)', display: 'flex', justifyContent: 'center', alignItems: 'center' },
+    pageTitle:      { fontSize: 20, fontWeight: '800', color: C.text, margin: 0, letterSpacing: '-0.2px' },
     pageSub:        { fontSize: 12, color: C.muted, marginTop: 2 },
-    browseBtn:      { display: 'flex', alignItems: 'center', gap: 5, backgroundColor: C.accentSoft, padding: '8px 14px', borderRadius: 20, border: 'none', cursor: 'pointer' },
+    browseBtn:      { display: 'flex', alignItems: 'center', gap: 5, backgroundColor: C.accentSoft, padding: '9px 16px', borderRadius: 22, border: 'none', cursor: 'pointer', boxShadow: '0 1px 4px rgba(30,79,216,0.15)' },
     browseBtnText:  { fontSize: 13, color: C.accent, fontWeight: '700' },
-    iconBtn:        { width: 36, height: 36, borderRadius: 10, backgroundColor: C.bg, border: `1px solid ${C.border}`, display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer' },
+    iconBtn:        { width: 38, height: 38, borderRadius: 10, backgroundColor: C.bg, border: `1px solid ${C.border}`, display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer' },
 
-    filterWrap: { backgroundColor: C.surface, borderBottom: `1px solid ${C.border}`, padding: '0 24px 12px' },
+    filterWrap: { backgroundColor: C.surface, borderBottom: `1px solid ${C.border}`, padding: '10px 28px 12px' },
     filterRow:  { display: 'flex', flexWrap: 'wrap', gap: 7 },
-    filterChip: { display: 'flex', alignItems: 'center', gap: 5, padding: '7px 12px', borderRadius: 20, backgroundColor: C.bg, border: `1px solid ${C.border}`, cursor: 'pointer' },
-    filterChipActive: { backgroundColor: C.navy, borderColor: C.navy },
+    filterChip: { display: 'flex', alignItems: 'center', gap: 5, padding: '7px 14px', borderRadius: 22, backgroundColor: C.bg, border: `1.5px solid ${C.border}`, cursor: 'pointer', transition: 'all 0.15s ease' },
+    filterChipActive: { background: 'linear-gradient(135deg, #0F1F3D 0%, #1E3A5F 100%)', borderColor: 'transparent', boxShadow: '0 2px 8px rgba(15,31,61,0.2)' },
     filterCount:      { backgroundColor: C.border, padding: '1px 6px', borderRadius: 10 },
     filterCountActive:{ backgroundColor: 'rgba(255,255,255,0.2)' },
 
-    list:    { padding: '16px 24px 32px', flex: 1 },
-    appGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: 12 },
+    list:    { padding: '18px 28px 40px', flex: 1, maxWidth: 1280, width: '100%', alignSelf: 'center', boxSizing: 'border-box' },
+    appGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: 14 },
 
-    appCard: { backgroundColor: C.surface, borderRadius: 14, border: `1px solid ${C.border}`, display: 'flex', flexDirection: 'row', overflow: 'hidden', boxShadow: '0 2px 6px rgba(15,31,61,0.05)', cursor: 'pointer' },
+    appCard: { backgroundColor: C.surface, borderRadius: 16, border: `1px solid ${C.border}`, display: 'flex', flexDirection: 'row', overflow: 'hidden', boxShadow: '0 2px 8px rgba(15,31,61,0.05)', cursor: 'pointer', transition: 'box-shadow 0.18s ease, transform 0.12s ease' },
     accentBar: { width: 4, flexShrink: 0 },
     appInner:  { flex: 1, padding: 15, minWidth: 0 },
     appTop:    { display: 'flex', alignItems: 'flex-start', marginBottom: 10 },

@@ -451,21 +451,22 @@ const S = {
     header: {
         backgroundColor: C.surface,
         borderBottom: `1px solid ${C.border}`,
-        padding: '14px 20px',
+        padding: '16px 24px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         position: 'sticky', top: 0, zIndex: 50,
+        boxShadow: '0 1px 4px rgba(15,31,61,0.06)',
     },
     backBtn: {
-        width: 38, height: 38, borderRadius: 10,
+        width: 40, height: 40, borderRadius: 11,
         backgroundColor: C.bg, border: `1px solid ${C.border}`,
         display: 'flex', justifyContent: 'center', alignItems: 'center',
-        cursor: 'pointer',
+        cursor: 'pointer', transition: 'background 0.15s ease',
     },
     headerCenter: { textAlign: 'center' },
-    headerTitle:  { fontSize: 16, fontWeight: '800', color: C.text, margin: 0 },
+    headerTitle:  { fontSize: 17, fontWeight: '800', color: C.text, margin: 0, letterSpacing: '-0.2px' },
     headerSub:    { fontSize: 11, color: C.muted, marginTop: 2 },
 
-    body: { flex: 1, padding: '16px 24px', display: 'flex', flexDirection: 'column', gap: 18, maxWidth: '100%', width: '100%', alignSelf: 'center', boxSizing: 'border-box' },
+    body: { flex: 1, padding: '20px 28px 40px', display: 'flex', flexDirection: 'column', gap: 20, maxWidth: 820, width: '100%', alignSelf: 'center', boxSizing: 'border-box' },
 
     statusHero: {
         borderRadius: 18, padding: '28px 24px',

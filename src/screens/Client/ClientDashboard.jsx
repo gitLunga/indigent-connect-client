@@ -275,11 +275,11 @@ export default function ClientDashboard() {
                             {stats.map((st, i) => {
                                 const Icon = st.icon;
                                 return (
-                                    <div key={i} style={S.statCard}>
+                                    <div key={i} style={{ ...S.statCard, borderTop: `3px solid ${st.color}` }}>
                                         <div style={{ ...S.statIco, backgroundColor: st.bg }}>
                                             <Icon size={18} color={st.color} />
                                         </div>
-                                        <div style={S.statVal}>{st.value}</div>
+                                        <div style={{ ...S.statVal, color: st.color }}>{st.value}</div>
                                         <div style={S.statLabel}>{st.label}</div>
                                     </div>
                                 );
@@ -423,14 +423,15 @@ const S = {
     header: {
         backgroundColor: C.surface,
         borderBottom: `1px solid ${C.border}`,
-        padding: '18px 24px',
+        padding: '18px 28px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16,
         flexWrap: 'wrap',
         position: 'sticky', top: 0, zIndex: 50,
+        boxShadow: '0 1px 4px rgba(15,31,61,0.06)',
     },
     headerLeft:  { display: 'flex', alignItems: 'center', gap: 14, flex: 1, minWidth: 0 },
-    headerIcon:  { width: 42, height: 42, borderRadius: 12, backgroundColor: C.accentSoft, display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 },
-    headerTitle: { fontSize: 19, fontWeight: '800', color: C.text, margin: 0 },
+    headerIcon:  { width: 44, height: 44, borderRadius: 13, background: 'linear-gradient(135deg, #EBF0FF 0%, #D4E0FF 100%)', display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 },
+    headerTitle: { fontSize: 20, fontWeight: '800', color: C.text, margin: 0, letterSpacing: '-0.2px' },
     headerSub:   { fontSize: 12, color: C.muted, marginTop: 2 },
     headerRight: { display: 'flex', alignItems: 'center', gap: 8 },
 
@@ -455,7 +456,7 @@ const S = {
         padding: '0 3px', border: `2px solid ${C.surface}`,
     },
 
-    body: { flex: 1, padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 22, maxWidth: '100%', width: '100%', alignSelf: 'center', boxSizing: 'border-box' },
+    body: { flex: 1, padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: 24, maxWidth: 1280, width: '100%', alignSelf: 'center', boxSizing: 'border-box' },
 
     profileBanner: {
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -469,33 +470,33 @@ const S = {
     profileBannerSub:   { fontSize: 12, color: '#B45309', lineHeight: 1.5 },
     profileBannerArrow: { flexShrink: 0 },
 
-    sectionHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
-    sectionTitle:  { fontSize: 15, fontWeight: '800', color: C.text, margin: 0 },
+    sectionHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 },
+    sectionTitle:  { fontSize: 15, fontWeight: '800', color: C.text, margin: 0, letterSpacing: '-0.1px' },
     seeAll: {
         display: 'flex', alignItems: 'center',
         fontSize: 13, color: C.accent, fontWeight: '600',
         background: 'none', border: 'none', cursor: 'pointer', padding: 0,
     },
 
-    statsGrid: { display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 },
-    statCard:  { backgroundColor: C.surface, borderRadius: 14, padding: '16px 14px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', border: `1px solid ${C.border}`, boxShadow: '0 2px 6px rgba(15,31,61,0.04)' },
-    statIco:   { width: 36, height: 36, borderRadius: 10, display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: 10 },
-    statVal:   { fontSize: 26, fontWeight: '900', color: C.text, lineHeight: 1 },
-    statLabel: { fontSize: 10, color: C.muted, fontWeight: '600', marginTop: 4, letterSpacing: '0.3px' },
+    statsGrid: { display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 },
+    statCard:  { backgroundColor: C.surface, borderRadius: 16, padding: '18px 16px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', border: `1px solid ${C.border}`, boxShadow: '0 2px 8px rgba(15,31,61,0.05)', overflow: 'hidden', position: 'relative' },
+    statIco:   { width: 38, height: 38, borderRadius: 11, display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: 12 },
+    statVal:   { fontSize: 30, fontWeight: '900', color: C.text, lineHeight: 1, letterSpacing: '-0.5px' },
+    statLabel: { fontSize: 11, color: C.muted, fontWeight: '600', marginTop: 5, letterSpacing: '0.2px' },
 
-    actionsRow: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 },
+    actionsRow: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 },
     actionCard: {
-        borderRadius: 18, padding: '20px 18px',
+        borderRadius: 20, padding: '22px 20px',
         position: 'relative', cursor: 'pointer',
         border: 'none', textAlign: 'left',
         display: 'flex', flexDirection: 'column',
     },
-    actionNavy: { backgroundColor: C.navy },
-    actionGreen:{ backgroundColor: C.green },
+    actionNavy: { background: 'linear-gradient(135deg, #0F1F3D 0%, #1E3A5F 100%)' },
+    actionGreen:{ background: 'linear-gradient(135deg, #047857 0%, #059669 100%)' },
     actionDisabled: { opacity: 0.5, cursor: 'not-allowed' },
-    actionIco:  { width: 44, height: 44, borderRadius: 12, display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: 12 },
-    actionTitle:{ fontSize: 15, fontWeight: '800', color: '#fff', lineHeight: 1.3 },
-    actionHint: { fontSize: 11, color: 'rgba(255,255,255,0.55)', marginTop: 4 },
+    actionIco:  { width: 46, height: 46, borderRadius: 13, display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: 14 },
+    actionTitle:{ fontSize: 16, fontWeight: '800', color: '#fff', lineHeight: 1.3 },
+    actionHint: { fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 5 },
     actionLockBadge: {
         position: 'absolute', top: 12, right: 12,
         backgroundColor: 'rgba(0,0,0,0.25)',

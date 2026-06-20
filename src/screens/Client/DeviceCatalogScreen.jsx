@@ -152,7 +152,7 @@ export default function DeviceCatalogScreen() {
     };
 
     const renderDevice = (item) => (
-        <div key={item.device_id} style={S.card}>
+        <div key={item.device_id} className="card-hover" style={S.card}>
             <div style={S.cardHeader}>
                 <div style={S.deviceIconWrap}>
                     <IoPhonePortraitOutline size={22} color={C.accent} />
@@ -288,38 +288,38 @@ const S = {
     gateSub:   { fontSize: 14, color: C.muted, textAlign: 'center', lineHeight: 1.5, marginBottom: 24, maxWidth: 320 },
     gateBtn:   { backgroundColor: C.navy, padding: '12px 22px', borderRadius: 12, border: 'none', color: '#fff', fontWeight: '700', fontSize: 14, cursor: 'pointer' },
 
-    pageHeader:     { backgroundColor: C.surface, borderBottom: `1px solid ${C.border}`, padding: '18px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, position: 'sticky', top: 0, zIndex: 50 },
+    pageHeader:     { backgroundColor: C.surface, borderBottom: `1px solid ${C.border}`, padding: '18px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, position: 'sticky', top: 0, zIndex: 50, boxShadow: '0 1px 4px rgba(15,31,61,0.06)' },
     pageHeaderLeft: { display: 'flex', alignItems: 'center', gap: 14 },
-    pageHeaderIcon: { width: 42, height: 42, borderRadius: 12, backgroundColor: C.accentSoft, display: 'flex', justifyContent: 'center', alignItems: 'center' },
-    pageTitle:      { fontSize: 19, fontWeight: '800', color: C.text, margin: 0 },
+    pageHeaderIcon: { width: 44, height: 44, borderRadius: 13, background: 'linear-gradient(135deg, #EBF0FF 0%, #D4E0FF 100%)', display: 'flex', justifyContent: 'center', alignItems: 'center' },
+    pageTitle:      { fontSize: 20, fontWeight: '800', color: C.text, margin: 0, letterSpacing: '-0.2px' },
     pageSub:        { fontSize: 12, color: C.muted, marginTop: 2 },
-    refreshBtn:     { padding: '8px 16px', borderRadius: 10, border: `1px solid ${C.border}`, background: C.surface, cursor: 'pointer', fontSize: 13, color: C.muted, fontWeight: '600' },
+    refreshBtn:     { padding: '8px 16px', borderRadius: 10, border: `1px solid ${C.border}`, background: C.surface, cursor: 'pointer', fontSize: 13, color: C.muted, fontWeight: '600', transition: 'background 0.15s' },
 
-    searchWrap: { padding: '14px 24px 0' },
-    searchBar:  { display: 'flex', alignItems: 'center', gap: 10, backgroundColor: C.surface, border: `1.5px solid ${C.border}`, borderRadius: 12, padding: '10px 14px' },
-    searchBarFocused: { borderColor: C.accent, backgroundColor: '#FAFBFF' },
+    searchWrap: { padding: '16px 28px 0', maxWidth: 1280, width: '100%', alignSelf: 'center', boxSizing: 'border-box' },
+    searchBar:  { display: 'flex', alignItems: 'center', gap: 10, backgroundColor: C.surface, border: `1.5px solid ${C.border}`, borderRadius: 14, padding: '11px 16px', boxShadow: '0 1px 4px rgba(15,31,61,0.04)' },
+    searchBarFocused: { borderColor: C.accent, backgroundColor: '#FAFBFF', boxShadow: `0 0 0 3px ${C.accent}18` },
     searchInput:{ flex: 1, fontSize: 15, color: C.text, border: 'none', background: 'transparent', outline: 'none' },
     clearBtn:   { background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center' },
 
-    grid:    { flex: 1, padding: '14px 24px 32px' },
-    cardGrid:{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 },
+    grid:    { flex: 1, padding: '16px 28px 40px', maxWidth: 1280, width: '100%', alignSelf: 'center', boxSizing: 'border-box' },
+    cardGrid:{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 },
 
-    card: { backgroundColor: C.surface, borderRadius: 16, padding: 18, border: `1px solid ${C.border}`, boxShadow: '0 2px 8px rgba(15,31,61,0.05)', display: 'flex', flexDirection: 'column' },
-    cardHeader:    { display: 'flex', alignItems: 'center', marginBottom: 12, gap: 12 },
-    deviceIconWrap:{ width: 44, height: 44, borderRadius: 12, backgroundColor: C.accentSoft, display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 },
-    deviceName:    { fontSize: 15, fontWeight: '800', color: C.text },
+    card: { backgroundColor: C.surface, borderRadius: 18, padding: 20, border: `1px solid ${C.border}`, boxShadow: '0 2px 10px rgba(15,31,61,0.06)', display: 'flex', flexDirection: 'column', transition: 'box-shadow 0.2s ease, transform 0.15s ease' },
+    cardHeader:    { display: 'flex', alignItems: 'center', marginBottom: 14, gap: 12 },
+    deviceIconWrap:{ width: 46, height: 46, borderRadius: 13, background: 'linear-gradient(135deg, #EBF0FF 0%, #D4E0FF 100%)', display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 },
+    deviceName:    { fontSize: 15, fontWeight: '800', color: C.text, letterSpacing: '-0.1px' },
     deviceMake:    { fontSize: 12, color: C.muted, marginTop: 2 },
-    pricePill:     { backgroundColor: C.greenSoft, padding: '6px 11px', borderRadius: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', marginLeft: 'auto' },
-    priceAmount:   { fontSize: 15, fontWeight: '800', color: C.green },
-    priceUnit:     { fontSize: 10, color: C.green, fontWeight: '600' },
-    tagsRow:       { display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 10 },
-    tag:           { display: 'flex', alignItems: 'center', backgroundColor: C.bg, border: `1px solid ${C.border}`, padding: '4px 8px', borderRadius: 8, gap: 3 },
+    pricePill:     { background: 'linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%)', padding: '8px 12px', borderRadius: 12, display: 'flex', flexDirection: 'column', alignItems: 'center', marginLeft: 'auto', flexShrink: 0 },
+    priceAmount:   { fontSize: 15, fontWeight: '900', color: '#047857' },
+    priceUnit:     { fontSize: 10, color: '#059669', fontWeight: '600' },
+    tagsRow:       { display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 },
+    tag:           { display: 'flex', alignItems: 'center', backgroundColor: C.bg, border: `1px solid ${C.border}`, padding: '4px 9px', borderRadius: 8, gap: 3 },
     tagText:       { fontSize: 11, color: C.muted, fontWeight: '500' },
-    planDetail:    { fontSize: 13, color: C.muted, lineHeight: 1.55, marginBottom: 14, flex: 1 },
-    cardFooter:    { display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 12, borderTop: `1px solid ${C.border}`, marginTop: 'auto' },
-    footerLabel:   { fontSize: 10, color: C.mutedLight, fontWeight: '600', letterSpacing: 0.4, marginBottom: 2 },
-    footerValue:   { fontSize: 14, fontWeight: '800', color: C.text },
-    applyBtn:      { display: 'flex', alignItems: 'center', backgroundColor: C.navy, padding: '10px 16px', borderRadius: 11, gap: 6, border: 'none', cursor: 'pointer' },
+    planDetail:    { fontSize: 13, color: C.muted, lineHeight: 1.6, marginBottom: 16, flex: 1 },
+    cardFooter:    { display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 14, borderTop: `1px solid ${C.border}`, marginTop: 'auto' },
+    footerLabel:   { fontSize: 10, color: C.mutedLight, fontWeight: '600', letterSpacing: 0.4, marginBottom: 3 },
+    footerValue:   { fontSize: 15, fontWeight: '900', color: C.text, letterSpacing: '-0.2px' },
+    applyBtn:      { display: 'flex', alignItems: 'center', background: 'linear-gradient(135deg, #0F1F3D 0%, #1E3A5F 100%)', padding: '11px 18px', borderRadius: 12, gap: 6, border: 'none', cursor: 'pointer', boxShadow: '0 3px 8px rgba(15,31,61,0.25)', transition: 'opacity 0.15s, transform 0.15s' },
     applyBtnLoading:{ opacity: 0.6, cursor: 'not-allowed' },
     applyBtnText:  { color: '#fff', fontSize: 13, fontWeight: '700' },
 
