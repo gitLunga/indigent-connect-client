@@ -18,8 +18,8 @@ import {
     IoMenuOutline,
     IoCloseOutline,
     IoChevronForward,
-    IoShieldCheckmarkOutline,
 } from 'react-icons/io5';
+import dojLogo from '../assets/images/Department-of-Justice-logo.jpg';
 
 // ─── Design tokens ────────────────────────────────────────────────────────
 export const C = {
@@ -126,7 +126,7 @@ export default function SidebarLayout({ children, unreadCount = 0, user }) {
             {/* Brand */}
             <div style={sb.brand}>
                 <div style={sb.brandIcon}>
-                    <IoShieldCheckmarkOutline size={collapsed ? 18 : 22} color="#fff" />
+                    <img src={dojLogo} alt="DoJ&CD" style={{ width: collapsed ? 22 : 28, height: collapsed ? 22 : 28, objectFit: 'contain', display: 'block' }} />
                 </div>
                 {!collapsed && (
                     <div>
@@ -329,7 +329,7 @@ export default function SidebarLayout({ children, unreadCount = 0, user }) {
                         <IoMenuOutline size={24} color={C.white} />
                     </button>
                     <div style={sb.mobileBrand}>
-                        <IoShieldCheckmarkOutline size={17} color="#fff" style={{ marginRight: 8 }} />
+                        <img src={dojLogo} alt="DoJ&CD" style={{ width: 22, height: 22, objectFit: 'contain', display: 'block', marginRight: 8, flexShrink: 0 }} />
                         <span style={sb.mobileBrandText}>DOJCD Connect</span>
                     </div>
                     <button style={sb.mobileIconBtn} onClick={() => navigate('/notifications')}>
@@ -404,12 +404,13 @@ const sb = {
         background: 'linear-gradient(135deg, rgba(30,79,216,0.12) 0%, transparent 100%)',
     },
     brandIcon: {
-        width: 40, height: 40, borderRadius: 12,
-        background: 'linear-gradient(135deg, rgba(30,79,216,0.5) 0%, rgba(255,255,255,0.1) 100%)',
-        border: '1px solid rgba(255,255,255,0.18)',
+        width: 42, height: 42, borderRadius: 12,
+        backgroundColor: '#fff',
+        border: '1px solid rgba(255,255,255,0.2)',
         display: 'flex', justifyContent: 'center', alignItems: 'center',
         flexShrink: 0,
-        boxShadow: '0 2px 8px rgba(30,79,216,0.3)',
+        boxShadow: '0 2px 10px rgba(0,0,0,0.25)',
+        overflow: 'hidden',
     },
     brandTitle: { fontSize: 15, fontWeight: '800', color: '#fff', letterSpacing: '0.4px' },
     brandSub:   { fontSize: 9,  fontWeight: '600', color: 'rgba(255,255,255,0.4)', letterSpacing: '0.8px', marginTop: 1, textTransform: 'uppercase' },

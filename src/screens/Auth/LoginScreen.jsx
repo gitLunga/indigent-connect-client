@@ -16,8 +16,8 @@ import {
     IoCheckmark,
     IoArrowForward,
     IoPersonOutline,
-    IoShieldCheckmarkOutline,
 } from 'react-icons/io5';
+import dojLogo from '../../assets/images/Department-of-Justice-logo.jpg';
 
 const C = {
     navy:       '#0F1F3D',
@@ -101,7 +101,7 @@ export default function LoginScreen() {
                 <div style={S.bannerRing1} />
                 <div style={S.bannerRing2} />
                 <div style={S.bannerContent}>
-                    <div style={S.bannerEmblem}><IoShieldCheckmarkOutline size={28} color="#fff" /></div>
+                    <div style={S.bannerEmblem}><img src={dojLogo} alt="DoJ&CD" style={{ width: 44, height: 44, objectFit: 'contain', display: 'block' }} /></div>
                     <div>
                         <h1 style={S.bannerTitle}>Welcome Back</h1>
                         <p style={S.bannerSub}>Sign in to your DOJCD Connect account</p>
@@ -230,7 +230,7 @@ const S = {
     bannerRing1: { position: 'absolute', width: 300, height: 300, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.05)', top: -100, right: -80 },
     bannerRing2: { position: 'absolute', width: 180, height: 180, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.06)', bottom: -60, left: -60 },
     bannerContent: { maxWidth: 560, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 16, position: 'relative', zIndex: 1, flexWrap: 'wrap' },
-    bannerEmblem:  { width: 54, height: 54, borderRadius: 16, background: 'linear-gradient(135deg, rgba(30,79,216,0.5) 0%, rgba(255,255,255,0.08) 100%)', border: '1px solid rgba(255,255,255,0.18)', display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0, boxShadow: '0 4px 12px rgba(30,79,216,0.3)' },
+    bannerEmblem:  { width: 56, height: 56, borderRadius: 16, backgroundColor: '#fff', border: '1px solid rgba(255,255,255,0.25)', display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0, boxShadow: '0 4px 14px rgba(0,0,0,0.25)', overflow: 'hidden' },
     bannerTitle:   { fontSize: 24, fontWeight: '800', color: '#fff', margin: '0 0 3px', letterSpacing: '-0.3px' },
     bannerSub:     { fontSize: 12, color: 'rgba(255,255,255,0.5)', margin: 0 },
     secureBadge:   { marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 7, backgroundColor: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.11)', padding: '6px 12px', borderRadius: 20 },

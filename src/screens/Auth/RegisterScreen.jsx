@@ -13,8 +13,8 @@ import {
     IoArrowForward,
     IoChevronForward,
     IoLogInOutline,
-    IoShieldCheckmarkOutline,
 } from 'react-icons/io5';
+import dojLogo from '../../assets/images/Department-of-Justice-logo.jpg';
 
 const C = {
     navy:       '#0F1F3D',
@@ -70,7 +70,7 @@ export default function RegisterScreen() {
             <div style={S.banner}>
                 <div style={S.bannerRing} />
                 <div style={S.bannerContent}>
-                    <div style={S.emblem}><IoShieldCheckmarkOutline size={28} color="#fff" /></div>
+                    <div style={S.emblem}><img src={dojLogo} alt="DoJ&CD" style={{ width: 44, height: 44, objectFit: 'contain', display: 'block' }} /></div>
                     <div>
                         <h1 style={S.bannerTitle}>Create Account</h1>
                         <p style={S.bannerSub}>Select your role to get started</p>
@@ -175,7 +175,7 @@ const S = {
     banner:        { background: 'linear-gradient(135deg, #0D1B35 0%, #0F1F3D 100%)', padding: '28px 24px 22px', position: 'relative', overflow: 'hidden' },
     bannerRing:    { position: 'absolute', width: 300, height: 300, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.04)', top: -100, right: -80 },
     bannerContent: { display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20, maxWidth: 680, margin: '0 auto 20px' },
-    emblem:        { width: 56, height: 56, borderRadius: 16, background: 'linear-gradient(135deg, rgba(30,79,216,0.5) 0%, rgba(255,255,255,0.08) 100%)', border: '1px solid rgba(255,255,255,0.16)', display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0, boxShadow: '0 4px 14px rgba(30,79,216,0.3)' },
+    emblem:        { width: 58, height: 58, borderRadius: 16, backgroundColor: '#fff', border: '1px solid rgba(255,255,255,0.2)', display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0, boxShadow: '0 4px 14px rgba(0,0,0,0.25)', overflow: 'hidden' },
     bannerTitle:   { fontSize: 24, fontWeight: '900', color: '#fff', margin: '0 0 4px', letterSpacing: '-0.3px' },
     bannerSub:     { fontSize: 12, color: 'rgba(255,255,255,0.5)', margin: 0 },
 

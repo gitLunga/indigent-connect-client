@@ -12,6 +12,7 @@ import {
     IoShieldCheckmarkOutline,
     IoCallOutline,
 } from 'react-icons/io5';
+import dojLogo from '../assets/images/Department-of-Justice-logo.jpg';
 
 const C = {
     navy:       '#0F1F3D',
@@ -73,7 +74,7 @@ export default function PublicFooter() {
                     {/* Brand col */}
                     <div style={S.col}>
                         <div style={S.brand}>
-                            <div style={S.brandIcon}><IoShieldCheckmarkOutline size={18} color="rgba(255,255,255,0.85)" /></div>
+                            <div style={S.brandIcon}><img src={dojLogo} alt="DoJ&CD" style={{ width: 30, height: 30, objectFit: 'contain', display: 'block' }} /></div>
                             <div>
                                 <div style={S.brandName}>DOJCD Connect</div>
                                 <div style={S.brandTagline}>Device Procurement Platform</div>
@@ -188,7 +189,7 @@ const S = {
     colTitle: { fontSize: 11, fontWeight: '700', color: 'rgba(255,255,255,0.45)', letterSpacing: '1.2px', marginBottom: 4 },
 
     brand:       { display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 },
-    brandIcon:   { width: 38, height: 38, borderRadius: 11, background: 'linear-gradient(135deg, rgba(30,79,216,0.35) 0%, rgba(255,255,255,0.08) 100%)', border: '1px solid rgba(255,255,255,0.14)', display: 'flex', justifyContent: 'center', alignItems: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.2)' },
+    brandIcon:   { width: 42, height: 42, borderRadius: 10, backgroundColor: '#fff', border: '1px solid rgba(255,255,255,0.15)', display: 'flex', justifyContent: 'center', alignItems: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.25)', overflow: 'hidden', flexShrink: 0 },
     brandName:   { fontSize: 15, fontWeight: '800', color: '#fff' },
     brandTagline:{ fontSize: 10, color: 'rgba(255,255,255,0.35)', marginTop: 2, fontWeight: '600', letterSpacing: '0.5px' },
     brandDesc:   { fontSize: 13, color: 'rgba(255,255,255,0.4)', lineHeight: 1.65, margin: 0 },

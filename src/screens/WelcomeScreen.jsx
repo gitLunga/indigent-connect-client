@@ -25,6 +25,7 @@ import {
     IoBriefcaseOutline,
     IoGridOutline,
 } from 'react-icons/io5';
+import dojLogo from '../assets/images/Department-of-Justice-logo.jpg';
 
 // ─── Design tokens ──────────────────────────────────────────────────────────
 const C = {
@@ -180,7 +181,7 @@ export default function WelcomeScreen() {
                     <div className="wc0" style={S.heroEmblemWrap}>
                         <div style={S.heroGlow} />
                         <div style={S.heroEmblem}>
-                            <IoShieldCheckmarkOutline size={56} color="#fff" />
+                            <img src={dojLogo} alt="Department of Justice & Constitutional Development" style={{ width: 90, height: 90, objectFit: 'contain', display: 'block' }} />
                         </div>
                     </div>
 
@@ -379,18 +380,19 @@ const S = {
         marginBottom: 32,
     },
 
-    heroEmblemWrap: { position: 'relative', marginBottom: 28 },
+    heroEmblemWrap: { position: 'relative', marginBottom: 32 },
     heroGlow: {
-        position: 'absolute', inset: -22, borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(30,79,216,0.35) 0%, transparent 70%)',
+        position: 'absolute', inset: -28, borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 70%)',
         pointerEvents: 'none',
     },
     heroEmblem: {
-        width: 108, height: 108, borderRadius: 32,
-        background: 'linear-gradient(135deg, rgba(30,79,216,0.45) 0%, rgba(255,255,255,0.08) 100%)',
-        border: '1.5px solid rgba(255,255,255,0.2)',
+        width: 116, height: 116, borderRadius: 28,
+        backgroundColor: '#fff',
+        border: '2px solid rgba(255,255,255,0.25)',
         display: 'flex', justifyContent: 'center', alignItems: 'center',
-        boxShadow: '0 10px 36px rgba(30,79,216,0.35)',
+        boxShadow: '0 14px 44px rgba(0,0,0,0.35)',
+        overflow: 'hidden',
     },
 
     heroTitle: {

@@ -23,11 +23,11 @@ import {
     IoBusinessOutline,
     IoBriefcaseOutline,
     IoDocumentTextOutline,
-    IoShieldCheckmarkOutline,
     IoArrowBack,
     IoArrowForward,
     IoCheckmarkCircleOutline,
 } from 'react-icons/io5';
+import dojLogo from '../../assets/images/Department-of-Justice-logo.jpg';
 
 const C = {
     navy:       '#0F1F3D',
@@ -416,7 +416,7 @@ export default function ClientRegisterScreen() {
                     <button style={headerStyles.backBtn} onClick={() => navigate(-1)}>
                         <IoArrowBack size={22} color="rgba(255,255,255,0.9)" />
                     </button>
-                    <div style={headerStyles.emblem}><IoShieldCheckmarkOutline size={24} color="#fff" /></div>
+                    <div style={headerStyles.emblem}><img src={dojLogo} alt="DoJ&CD" style={{ width: 38, height: 38, objectFit: 'contain', display: 'block' }} /></div>
                     <div>
                         <div style={headerStyles.title}>Client Registration</div>
                         <div style={headerStyles.sub}>Create your account to request devices</div>
@@ -470,7 +470,7 @@ const headerStyles = {
     ring:      { position: 'absolute', width: 300, height: 300, borderRadius: 150, border: '1px solid rgba(255,255,255,0.04)', top: -100, right: -80 },
     backBtn:   { width: 40, height: 40, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', flexShrink: 0, transition: 'background 0.15s' },
     titleRow:  { display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20, maxWidth: 640, margin: '0 auto 20px' },
-    emblem:    { width: 50, height: 50, borderRadius: 15, background: 'linear-gradient(135deg, rgba(30,79,216,0.5) 0%, rgba(255,255,255,0.08) 100%)', border: '1px solid rgba(255,255,255,0.16)', display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0, boxShadow: '0 4px 14px rgba(30,79,216,0.3)' },
+    emblem:    { width: 52, height: 52, borderRadius: 14, backgroundColor: '#fff', border: '1px solid rgba(255,255,255,0.2)', display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0, boxShadow: '0 4px 14px rgba(0,0,0,0.25)', overflow: 'hidden' },
     title:     { fontSize: 20, fontWeight: '900', color: '#fff', marginBottom: 3, letterSpacing: '-0.2px' },
     sub:       { fontSize: 11, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.2px' },
 };

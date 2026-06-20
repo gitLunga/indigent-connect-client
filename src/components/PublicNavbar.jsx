@@ -5,7 +5,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { IoMenuOutline, IoCloseOutline, IoShieldCheckmarkOutline } from 'react-icons/io5';
+import { IoMenuOutline, IoCloseOutline } from 'react-icons/io5';
+import dojLogo from '../assets/images/Department-of-Justice-logo.jpg';
 
 const C = {
     navy: '#0F1F3D', accent: '#1E4FD8', surface: '#FFFFFF',
@@ -48,7 +49,7 @@ export default function PublicNavbar() {
                 <div className="anb-inner">
                     {/* Logo */}
                     <button className="anb-logo" onClick={() => go('/')}>
-                        <span className="anb-logo-icon"><IoShieldCheckmarkOutline size={20} color="#fff" /></span>
+                        <span className="anb-logo-icon"><img src={dojLogo} alt="DoJ&CD" className="anb-logo-img" /></span>
                         <span className="anb-logo-text">
                             <strong>DOJCD</strong>
                             <small>Connect</small>
@@ -115,10 +116,15 @@ const navbarCSS = `
     background: none; border: none; cursor: pointer; padding: 0; text-decoration: none;
   }
   .anb-logo-icon {
-    width: 38px; height: 38px; border-radius: 11px;
-    background: linear-gradient(135deg, #0F1F3D 0%, #1E3A5F 100%);
+    width: 40px; height: 40px; border-radius: 10px;
+    background: #fff;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 2px 8px rgba(15,31,61,0.25);
+    box-shadow: 0 2px 8px rgba(15,31,61,0.15);
+    border: 1px solid #E2E8F2;
+    overflow: hidden; flex-shrink: 0;
+  }
+  .anb-logo-img {
+    width: 34px; height: 34px; object-fit: contain; display: block;
   }
   .anb-logo-text {
     display: flex; flex-direction: column; align-items: flex-start; line-height: 1;
