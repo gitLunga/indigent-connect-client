@@ -142,17 +142,12 @@ export const authAPI = {
                 formData.append('residence_document', profileData.residence_document);
             }
 
-            // Use a separate axios instance to avoid default JSON Content-Type
-            const formDataAxios = axios.create({
-                baseURL: BASE_URL,
-                timeout: 60000,
-            });
-
-            const response = await formDataAxios.post(
+            const response = await api.post(
                 `/auth/complete-profile/${clientUserId}`,
                 formData,
                 {
                     headers: { 'Content-Type': 'multipart/form-data' },
+                    timeout: 60000,
                 }
             );
 
