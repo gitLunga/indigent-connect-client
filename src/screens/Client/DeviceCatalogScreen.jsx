@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { deviceAPI } from '../../services/api';
 import { useToast } from '../../components/ToastProvider';
 import ConfirmDialog from '../../components/ConfirmDialog';
+import { Sk, SkeletonShimmerStyle } from '../../components/SkeletonLoader';
 import {
     IoPhonePortraitOutline,
     IoCalendarOutline,
@@ -48,6 +49,7 @@ export default function DeviceCatalogScreen() {
     const [searchFocused, setSearchFocused] = useState(false);
     const [dialog,        setDialog]        = useState(null);
     const [applying,      setApplying]      = useState(null); // device being applied for
+    const [detailDevice,  setDetailDevice]  = useState(null); // device open in detail modal
 
     useEffect(() => { init(); }, []);
     useEffect(() => { filterDevices(); }, [search, devices]);
@@ -186,14 +188,11 @@ export default function DeviceCatalogScreen() {
                     <div style={S.footerValue}>R{(item.monthly_cost * item.contract_duration_months).toFixed(2)}</div>
                 </div>
                 <button
-                    style={{ ...S.applyBtn, ...(applying === item.device_id ? S.applyBtnLoading : {}) }}
-                    onClick={() => handleApplyClick(item)}
-                    disabled={!!applying}
+                    style={S.applyBtn}
+                    onClick={() => setDetailDevice(item)}
                 >
-                    <span style={S.applyBtnText}>
-                        {applying === item.device_id ? 'Applying…' : 'Apply Now'}
-                    </span>
-                    {applying !== item.device_id && <IoArrowForward size={15} color="#fff" />}
+                    <span style={S.applyBtnText}>View & Apply</span>
+                    <IoArrowForward size={15} color="#fff" />
                 </button>
             </div>
         </div>
@@ -201,9 +200,53 @@ export default function DeviceCatalogScreen() {
 
     if (loading) {
         return (
-            <div style={S.center}>
-                <div style={{ width: 40, height: 40, border: `3px solid ${C.border}`, borderTopColor: C.accent, borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
-                <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+            <div style={{ backgroundColor: C.bg, minHeight: '100%', display: 'flex', flexDirection: 'column' }}>
+                <SkeletonShimmerStyle />
+                {/* Header */}
+                <div style={{ backgroundColor: C.surface, borderBottom: `1px solid ${C.border}`, padding: '18px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 1px 4px rgba(15,31,61,0.06)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                        <Sk w={44} h={44} r={13} />
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                            <Sk w={160} h={18} r={8} />
+                            <Sk w={110} h={12} r={6} />
+                        </div>
+                    </div>
+                    <Sk w={82} h={36} r={10} />
+                </div>
+                {/* Search bar */}
+                <div style={{ padding: '16px 28px 0', maxWidth: 1280, width: '100%', alignSelf: 'center', boxSizing: 'border-box' }}>
+                    <Sk w="100%" h={48} r={14} />
+                </div>
+                {/* Device grid */}
+                <div style={{ padding: '16px 28px 40px', maxWidth: 1280, width: '100%', alignSelf: 'center', boxSizing: 'border-box' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
+                        {[...Array(6)].map((_, i) => (
+                            <div key={i} style={{ backgroundColor: C.surface, borderRadius: 18, padding: 20, border: `1px solid ${C.border}`, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                    <Sk w={46} h={46} r={13} />
+                                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 7 }}>
+                                        <Sk w="70%" h={16} r={7} />
+                                        <Sk w="50%" h={12} r={6} />
+                                    </div>
+                                    <Sk w={56} h={52} r={12} />
+                                </div>
+                                <div style={{ display: 'flex', gap: 6 }}>
+                                    <Sk w={72} h={26} r={8} />
+                                    <Sk w={82} h={26} r={8} />
+                                    <Sk w={52} h={26} r={8} />
+                                </div>
+                                <Sk w="100%" h={52} r={8} />
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 14, borderTop: `1px solid ${C.border}` }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                                        <Sk w={64} h={10} r={5} />
+                                        <Sk w={80} h={18} r={7} />
+                                    </div>
+                                    <Sk w={100} h={40} r={12} />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </div>
         );
     }
@@ -221,7 +264,10 @@ export default function DeviceCatalogScreen() {
 
     return (
         <>
-            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+            <style>{`
+                @keyframes spin     { to { transform: rotate(360deg); } }
+                @keyframes modalPop { from { opacity:0; transform:scale(0.93) translateY(10px); } to { opacity:1; transform:scale(1) translateY(0); } }
+            `}</style>
             <div style={S.root}>
                 {/* Page header */}
                 <div style={S.pageHeader}>
@@ -275,6 +321,74 @@ export default function DeviceCatalogScreen() {
             </div>
 
             <ConfirmDialog config={dialog} onClose={() => setDialog(null)} />
+
+            {/* ── Device Detail Modal ─────────────────────────────────── */}
+            {detailDevice && (
+                <>
+                    <div style={{ position: 'fixed', inset: 0, zIndex: 300, backgroundColor: 'rgba(15,31,61,0.5)', backdropFilter: 'blur(2px)' }} onClick={() => setDetailDevice(null)} />
+                    <div style={{ position: 'fixed', inset: 0, zIndex: 301, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, pointerEvents: 'none' }}>
+                        <div style={{ backgroundColor: C.surface, borderRadius: 22, width: '100%', maxWidth: 480, maxHeight: '90vh', display: 'flex', flexDirection: 'column', boxShadow: '0 24px 64px rgba(15,31,61,0.22)', border: `1px solid ${C.border}`, animation: 'modalPop 0.22s cubic-bezier(0.34,1.56,0.64,1)', pointerEvents: 'auto' }} onClick={e => e.stopPropagation()}>
+                            {/* Modal header */}
+                            <div style={{ padding: '18px 18px 14px', borderBottom: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', gap: 12 }}>
+                                <div style={{ width: 50, height: 50, borderRadius: 14, background: 'linear-gradient(135deg, #EBF0FF 0%, #D4E0FF 100%)', display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 }}>
+                                    <IoPhonePortraitOutline size={24} color={C.accent} />
+                                </div>
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                    <div style={{ fontSize: 16, fontWeight: '800', color: C.text, marginBottom: 2 }}>{detailDevice.device_name}</div>
+                                    <div style={{ fontSize: 12, color: C.muted }}>{detailDevice.manufacturer}</div>
+                                </div>
+                                <div style={{ background: 'linear-gradient(135deg, #D1FAE5, #A7F3D0)', padding: '8px 12px', borderRadius: 11, display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 }}>
+                                    <div style={{ fontSize: 16, fontWeight: '900', color: '#047857' }}>R{detailDevice.monthly_cost}</div>
+                                    <div style={{ fontSize: 10, color: '#059669', fontWeight: '600' }}>/mo</div>
+                                </div>
+                                <button style={{ width: 32, height: 32, borderRadius: 9, backgroundColor: C.bg, border: `1px solid ${C.border}`, display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', flexShrink: 0 }} onClick={() => setDetailDevice(null)}>
+                                    <IoCloseCircle size={18} color={C.mutedLight} />
+                                </button>
+                            </div>
+
+                            {/* Scrollable specs */}
+                            <div style={{ flex: 1, overflowY: 'auto', padding: '0 18px' }}>
+                                {[
+                                    { label: 'Model',          value: detailDevice.model },
+                                    { label: 'Manufacturer',   value: detailDevice.manufacturer },
+                                    { label: 'Plan',           value: detailDevice.plan_name },
+                                    { label: 'Monthly Cost',   value: `R${detailDevice.monthly_cost}`, color: C.green },
+                                    { label: 'Contract',       value: `${detailDevice.contract_duration_months} Months` },
+                                    { label: 'Total Cost',     value: `R${(Number(detailDevice.monthly_cost) * Number(detailDevice.contract_duration_months)).toLocaleString('en-ZA', { minimumFractionDigits: 2 })}`, color: C.navy },
+                                ].map((row, i, arr) => (
+                                    <div key={i} style={{ display: 'flex', alignItems: 'center', paddingTop: 11, paddingBottom: 11, borderBottom: i < arr.length - 1 ? `1px solid ${C.border}` : 'none' }}>
+                                        <div style={{ fontSize: 13, color: C.muted, width: 126, flexShrink: 0 }}>{row.label}</div>
+                                        <div style={{ fontSize: 13, fontWeight: '700', color: row.color || C.text }}>{row.value || '—'}</div>
+                                    </div>
+                                ))}
+                                {detailDevice.plan_details && (
+                                    <div style={{ padding: '11px 13px', backgroundColor: C.bg, borderRadius: 11, margin: '10px 0 14px', border: `1px solid ${C.border}` }}>
+                                        <div style={{ fontSize: 10, fontWeight: '700', color: C.muted, letterSpacing: '0.9px', marginBottom: 5 }}>PLAN DETAILS</div>
+                                        <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.65 }}>{detailDevice.plan_details}</div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Apply footer */}
+                            <div style={{ padding: '14px 18px', borderTop: `1px solid ${C.border}` }}>
+                                <button
+                                    style={{ width: '100%', background: 'linear-gradient(135deg, #0F1F3D 0%, #1E3A5F 100%)', padding: '14px', borderRadius: 14, border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, cursor: applying ? 'not-allowed' : 'pointer', opacity: applying ? 0.6 : 1, boxShadow: '0 4px 12px rgba(15,31,61,0.25)' }}
+                                    onClick={() => {
+                                        setDetailDevice(null);
+                                        handleApplyClick(detailDevice);
+                                    }}
+                                    disabled={!!applying}
+                                >
+                                    <span style={{ color: '#fff', fontSize: 14, fontWeight: '700' }}>
+                                        {applying === detailDevice.device_id ? 'Applying…' : 'Apply for this Device'}
+                                    </span>
+                                    {applying !== detailDevice.device_id && <IoArrowForward size={16} color="#fff" />}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </>
+            )}
         </>
     );
 }

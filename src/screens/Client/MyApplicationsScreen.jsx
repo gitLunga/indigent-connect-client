@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { deviceAPI } from '../../services/api';
 import { useToast } from '../../components/ToastProvider';
 import ConfirmDialog from '../../components/ConfirmDialog';
+import { Sk, SkeletonShimmerStyle } from '../../components/SkeletonLoader';
 import {
     IoAppsOutline,
     IoTimeOutline,
@@ -256,9 +257,54 @@ export default function MyApplicationsScreen() {
 
     if (loading) {
         return (
-            <div style={S.center}>
-                <div style={{ width: 40, height: 40, border: `3px solid ${C.border}`, borderTopColor: C.accent, borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
-                <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+            <div style={{ backgroundColor: C.bg, minHeight: '100%', display: 'flex', flexDirection: 'column' }}>
+                <SkeletonShimmerStyle />
+                {/* Header */}
+                <div style={{ backgroundColor: C.surface, borderBottom: `1px solid ${C.border}`, padding: '18px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 1px 4px rgba(15,31,61,0.06)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                        <Sk w={44} h={44} r={13} />
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                            <Sk w={180} h={18} r={8} />
+                            <Sk w={130} h={12} r={6} />
+                        </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: 10 }}>
+                        <Sk w={130} h={38} r={22} />
+                        <Sk w={38} h={38} r={10} />
+                    </div>
+                </div>
+                {/* Filter chips */}
+                <div style={{ backgroundColor: C.surface, borderBottom: `1px solid ${C.border}`, padding: '10px 28px 12px', display: 'flex', gap: 7, flexWrap: 'wrap' }}>
+                    {[...Array(6)].map((_, i) => <Sk key={i} w={82} h={34} r={22} />)}
+                </div>
+                {/* App cards */}
+                <div style={{ padding: '18px 28px 40px', maxWidth: 1280, width: '100%', alignSelf: 'center', boxSizing: 'border-box' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: 14 }}>
+                        {[...Array(4)].map((_, i) => (
+                            <div key={i} style={{ backgroundColor: C.surface, borderRadius: 16, border: `1px solid ${C.border}`, display: 'flex', overflow: 'hidden' }}>
+                                <div style={{ width: 4, backgroundColor: C.border, flexShrink: 0 }} />
+                                <div style={{ flex: 1, padding: 15, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+                                            <Sk w={160} h={16} r={8} />
+                                            <Sk w={120} h={12} r={6} />
+                                        </div>
+                                        <Sk w={72} h={24} r={12} />
+                                    </div>
+                                    <div style={{ display: 'flex', gap: 6 }}>
+                                        <Sk w={88} h={24} r={8} />
+                                        <Sk w={78} h={24} r={8} />
+                                        <Sk w={58} h={24} r={8} />
+                                    </div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <Sk w={100} h={11} r={5} />
+                                        <Sk w={42} h={16} r={6} />
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </div>
         );
     }

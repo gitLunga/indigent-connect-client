@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { deviceAPI, notificationAPI } from '../../services/api';
 import { useToast } from '../../components/ToastProvider';
 import ConfirmDialog from '../../components/ConfirmDialog';
+import { Sk, SkeletonShimmerStyle } from '../../components/SkeletonLoader';
 import {
     IoDocumentTextOutline,
     IoTimeOutline,
@@ -170,13 +171,73 @@ export default function ClientDashboard() {
         { label: 'Rejected', value: summary?.rejected           || 0, icon: IoCloseCircleOutline,     color: C.rose,   bg: C.roseSoft },
     ];
 
-    // ── Loading ───────────────────────────────────────────────────────────
+    // ── Loading skeleton ──────────────────────────────────────────────────
     if (loading) {
+        const skBg = { backgroundColor: C.surface, borderRadius: 16, padding: '18px 16px', border: `1px solid ${C.border}`, display: 'flex', flexDirection: 'column', gap: 10 };
         return (
-            <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', gap: 14, backgroundColor: C.bg, minHeight: '100%' }}>
-                <div style={{ width: 40, height: 40, border: `3px solid ${C.border}`, borderTopColor: C.accent, borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
-                <span style={{ fontSize: 14, color: C.muted, fontWeight: '500' }}>Loading dashboard…</span>
-                <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+            <div style={{ backgroundColor: C.bg, minHeight: '100%', display: 'flex', flexDirection: 'column' }}>
+                <SkeletonShimmerStyle />
+                {/* Header */}
+                <div style={{ backgroundColor: C.surface, borderBottom: `1px solid ${C.border}`, padding: '18px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 1px 4px rgba(15,31,61,0.06)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                        <Sk w={44} h={44} r={13} />
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                            <Sk w={220} h={18} r={8} />
+                            <Sk w={160} h={12} r={6} />
+                        </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                        <Sk w={38} h={38} r={10} />
+                        <Sk w={38} h={38} r={10} />
+                    </div>
+                </div>
+                {/* Body */}
+                <div style={{ padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: 24, maxWidth: 1280, width: '100%', alignSelf: 'center', boxSizing: 'border-box' }}>
+                    {/* Stats grid */}
+                    <div>
+                        <Sk w={160} h={16} r={8} style={{ marginBottom: 14 }} />
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+                            {[...Array(4)].map((_, i) => (
+                                <div key={i} style={skBg}>
+                                    <Sk w={38} h={38} r={11} />
+                                    <Sk w={54} h={28} r={8} />
+                                    <Sk w={48} h={11} r={5} />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    {/* Action cards */}
+                    <div>
+                        <Sk w={120} h={16} r={8} style={{ marginBottom: 14 }} />
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                            {[...Array(2)].map((_, i) => (
+                                <div key={i} style={{ borderRadius: 20, padding: '22px 20px', backgroundColor: C.border, display: 'flex', flexDirection: 'column', gap: 12, minHeight: 148 }}>
+                                    <Sk w={46} h={46} r={13} style={{ background: 'rgba(255,255,255,0.35)', animation: 'none' }} />
+                                    <Sk w="55%" h={18} r={8} style={{ background: 'rgba(255,255,255,0.35)', animation: 'none' }} />
+                                    <Sk w="40%" h={12} r={6} style={{ background: 'rgba(255,255,255,0.25)', animation: 'none' }} />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    {/* Recent apps */}
+                    <div>
+                        <Sk w={180} h={16} r={8} style={{ marginBottom: 14 }} />
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                            {[...Array(3)].map((_, i) => (
+                                <div key={i} style={{ backgroundColor: C.surface, borderRadius: 12, padding: '12px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: `1px solid ${C.border}` }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1 }}>
+                                        <Sk w={34} h={34} r={9} />
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+                                            <Sk w={140} h={14} r={7} />
+                                            <Sk w={100} h={11} r={5} />
+                                        </div>
+                                    </div>
+                                    <Sk w={72} h={24} r={12} />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }

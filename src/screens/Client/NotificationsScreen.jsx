@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { notificationAPI } from '../../services/api';
 import { useToast } from '../../components/ToastProvider';
 import ConfirmDialog from '../../components/ConfirmDialog';
+import { Sk, SkeletonShimmerStyle } from '../../components/SkeletonLoader';
 import {
     IoNotificationsOutline,
     IoCheckmarkDoneOutline,
@@ -188,9 +189,35 @@ export default function NotificationsScreen() {
 
     if (loading) {
         return (
-            <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', gap: 14, backgroundColor: C.bg, minHeight: '100%' }}>
-                <div style={{ width: 36, height: 36, border: `3px solid ${C.border}`, borderTopColor: C.accent, borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
-                <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+            <div style={{ backgroundColor: C.bg, minHeight: '100%', display: 'flex', flexDirection: 'column' }}>
+                <SkeletonShimmerStyle />
+                {/* Header */}
+                <div style={{ backgroundColor: C.surface, borderBottom: `1px solid ${C.border}`, padding: '18px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 1px 4px rgba(15,31,61,0.06)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                        <Sk w={44} h={44} r={13} />
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                            <Sk w={148} h={18} r={8} />
+                            <Sk w={96} h={12} r={6} />
+                        </div>
+                    </div>
+                    <Sk w={38} h={38} r={10} />
+                </div>
+                {/* Notification items */}
+                <div style={{ padding: '18px 28px 40px', maxWidth: 900, width: '100%', alignSelf: 'center', boxSizing: 'border-box' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        {[...Array(6)].map((_, i) => (
+                            <div key={i} style={{ backgroundColor: C.surface, borderRadius: 14, border: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', padding: '14px', gap: 12, overflow: 'hidden' }}>
+                                <Sk w={36} h={36} r={10} />
+                                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                    <Sk w="58%" h={14} r={7} />
+                                    <Sk w="88%" h={12} r={6} />
+                                    <Sk w={80} h={11} r={5} />
+                                </div>
+                                <Sk w={36} h={36} r={8} />
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </div>
         );
     }

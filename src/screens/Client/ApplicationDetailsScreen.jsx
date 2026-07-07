@@ -11,6 +11,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { deviceAPI } from '../../services/api';
 import { useToast } from '../../components/ToastProvider';
 import ConfirmDialog from '../../components/ConfirmDialog';
+import { Sk, SkeletonShimmerStyle } from '../../components/SkeletonLoader';
 import {
     IoArrowBack,
     IoCheckmarkCircle,
@@ -26,6 +27,7 @@ import {
     IoDocumentTextOutline,
     IoBriefcaseOutline,
     IoInformationCircleOutline,
+    IoRefreshOutline,
 } from 'react-icons/io5';
 
 // ─── Design tokens ─────────────────────────────────────────────────────────
@@ -80,6 +82,7 @@ export default function ApplicationDetailsScreen() {
     const [application, setApplication] = useState(null);
     const [loading,     setLoading]     = useState(true);
     const [cancelling,  setCancelling]  = useState(false);
+    const [reapplying,  setReapplying]  = useState(false);
     const [user,        setUser]        = useState(null);
     const [dialog,      setDialog]      = useState(null);
 
@@ -162,6 +165,37 @@ export default function ApplicationDetailsScreen() {
             .finally(() => setCancelling(false));
     };
 
+    const handleReapplyClick = () => {
+        if (!user?.client_user_id || !application) return;
+        setDialog({
+            title: 'Re-apply for Device',
+            message: `Re-apply for the ${application.device_name}?`,
+            details: 'A new application will be created and submitted for review.',
+            confirmText: 'Yes, Re-apply',
+            cancelText: 'Not Now',
+            variant: 'primary',
+            onConfirm: doReapply,
+        });
+    };
+
+    const doReapply = () => {
+        setReapplying(true);
+        deviceAPI.resubmitApplication(user.client_user_id, application.application_id)
+            .then(res => {
+                if (res.data.success) {
+                    toast.success('Re-applied!', res.data.message || 'New application submitted for review.');
+                    setTimeout(() => navigate('/my-applications'), 1200);
+                } else {
+                    toast.error('Failed', res.data.message);
+                }
+            })
+            .catch(error => {
+                const msg = error.response?.data?.message;
+                toast.error('Failed', msg || error.message);
+            })
+            .finally(() => setReapplying(false));
+    };
+
     const fmtDate = (d) => {
         if (!d) return '—';
         return new Date(d).toLocaleDateString('en-ZA', {
@@ -176,13 +210,63 @@ export default function ApplicationDetailsScreen() {
         });
     };
 
-    // ── Loading ───────────────────────────────────────────────────────────
+    // ── Loading skeleton ──────────────────────────────────────────────────
     if (loading) {
         return (
-            <div style={{ flex: 1, minHeight: '100%', backgroundColor: C.bg, display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', gap: 14 }}>
-                <div style={{ width: 40, height: 40, border: `3px solid ${C.border}`, borderTopColor: C.accent, borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
-                <div style={{ fontSize: 14, color: C.muted, fontWeight: '500' }}>Loading details…</div>
-                <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+            <div style={{ backgroundColor: C.bg, minHeight: '100%', display: 'flex', flexDirection: 'column' }}>
+                <SkeletonShimmerStyle />
+                {/* Header */}
+                <div style={{ backgroundColor: C.surface, borderBottom: `1px solid ${C.border}`, padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 1px 4px rgba(15,31,61,0.06)' }}>
+                    <Sk w={40} h={40} r={11} />
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 7 }}>
+                        <Sk w={170} h={17} r={8} />
+                        <Sk w={110} h={12} r={6} />
+                    </div>
+                    <div style={{ width: 40 }} />
+                </div>
+                {/* Body */}
+                <div style={{ padding: '20px 28px 40px', display: 'flex', flexDirection: 'column', gap: 20, maxWidth: 820, width: '100%', alignSelf: 'center', boxSizing: 'border-box' }}>
+                    {/* Status hero */}
+                    <div style={{ borderRadius: 18, padding: '28px 24px', backgroundColor: C.slateSoft, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+                        <Sk w={72} h={72} r={20} />
+                        <Sk w={140} h={22} r={10} />
+                        <Sk w={100} h={13} r={6} />
+                    </div>
+                    {/* Device card */}
+                    <div style={{ backgroundColor: C.surface, borderRadius: 16, border: `1px solid ${C.border}`, padding: '0 16px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 14, paddingTop: 16, paddingBottom: 16, borderBottom: `1px solid ${C.border}` }}>
+                            <Sk w={48} h={48} r={13} />
+                            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 7 }}>
+                                <Sk w="60%" h={17} r={8} />
+                                <Sk w="40%" h={12} r={6} />
+                            </div>
+                            <Sk w={60} h={52} r={11} />
+                        </div>
+                        {[...Array(6)].map((_, i) => (
+                            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, paddingTop: 13, paddingBottom: 13, borderBottom: i < 5 ? `1px solid ${C.border}` : 'none' }}>
+                                <Sk w={32} h={32} r={9} />
+                                <Sk w={120} h={13} r={6} />
+                                <Sk w="35%" h={13} r={6} style={{ marginLeft: 'auto' }} />
+                            </div>
+                        ))}
+                    </div>
+                    {/* Timeline */}
+                    <div style={{ backgroundColor: C.surface, borderRadius: 16, border: `1px solid ${C.border}`, padding: 16 }}>
+                        {[...Array(4)].map((_, i) => (
+                            <div key={i} style={{ display: 'flex', gap: 14, marginBottom: i < 3 ? 22 : 0 }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 28, flexShrink: 0 }}>
+                                    <Sk w={18} h={18} r={9} />
+                                    {i < 3 && <div style={{ width: 2, height: 32, backgroundColor: C.border, margin: '3px 0' }} />}
+                                </div>
+                                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 7 }}>
+                                    <Sk w="50%" h={14} r={7} />
+                                    <Sk w="75%" h={12} r={6} />
+                                    <Sk w={100} h={11} r={5} />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </div>
         );
     }
@@ -219,49 +303,81 @@ export default function ApplicationDetailsScreen() {
         ? `R${(Number(application.monthly_cost) * Number(application.contract_duration_months)).toLocaleString('en-ZA')}`
         : '—';
 
-    // Build timeline steps
-    const isPending   = application.application_status === 'Pending';
-    const isFinalised = ['Approved', 'Rejected', 'Cancelled'].includes(application.application_status);
+    // Build 4-step timeline
+    const currentStepIdx = {
+        Pending:         1,
+        Pending_Finance: 2,
+        Approved:        3,
+        Rejected:        3,
+        Cancelled:       3,
+    }[application.application_status] ?? 1;
+    const isActive = ['Pending', 'Pending_Finance'].includes(application.application_status);
 
     const timelineSteps = [
         {
             key: 'submitted',
             label: 'Application Submitted',
-            sublabel: `Application #${application.application_id ?? applicationId} created`,
+            sublabel: `Application #${application.application_id ?? applicationId} received by DoJ&CD`,
             date: application.submission_date,
-            done: true,
+            state: 'done',
             color: C.green,
+            showBadge: false,
         },
         {
             key: 'review',
-            label: 'Under Review',
-            sublabel: isPending
-                ? `Status: ${meta.label} — awaiting decision`
-                : `Status moved to: ${meta.timelineLabel}`,
-            date: application.last_updated,
-            done: true,   // always shown as reached once submitted
-            inProgress: isPending,
-            color: isPending ? C.amber : isFinalised ? C.green : C.muted,
+            label: 'Initial Review',
+            sublabel: currentStepIdx === 1
+                ? 'Your application is being reviewed by the DoJ&CD team'
+                : currentStepIdx > 1
+                    ? 'Completed — forwarded for finance assessment'
+                    : 'Awaiting review',
+            date: currentStepIdx >= 1 ? application.last_updated : null,
+            state: currentStepIdx > 1 ? 'done' : (currentStepIdx === 1 && isActive ? 'active' : 'upcoming'),
+            color: C.green,
+            showBadge: currentStepIdx === 1 && isActive,
         },
-        ...(isFinalised ? [{
-            key: 'outcome',
-            label: meta.timelineLabel,
+        {
+            key: 'finance',
+            label: 'Finance Review',
+            sublabel: currentStepIdx === 2
+                ? 'Being assessed by the Finance department'
+                : currentStepIdx > 2
+                    ? 'Finance approval granted'
+                    : 'Awaiting Finance review',
+            date: currentStepIdx >= 2 ? application.last_updated : null,
+            state: currentStepIdx > 2 ? 'done' : (currentStepIdx === 2 && isActive ? 'active' : 'upcoming'),
+            color: C.green,
+            showBadge: currentStepIdx === 2 && isActive,
+        },
+        {
+            key: 'decision',
+            label: application.application_status === 'Approved' ? 'Approved'
+                 : application.application_status === 'Rejected' ? 'Rejected'
+                 : application.application_status === 'Cancelled' ? 'Cancelled'
+                 : 'Final Decision',
             sublabel: application.application_status === 'Approved'
-                ? 'Your device application has been approved.'
+                ? 'Your device application has been approved — device will be issued'
                 : application.application_status === 'Rejected'
-                    ? (application.rejection_reason || 'Application was not approved.')
-                    : 'Application was cancelled.',
-            date: application.last_updated,
-            done: true,
-            color: meta.dot,
-        }] : []),
+                    ? (application.rejection_reason || 'Application was not approved at this time')
+                    : application.application_status === 'Cancelled'
+                        ? 'This application was cancelled'
+                        : 'Awaiting final decision from management',
+            date: currentStepIdx >= 3 ? application.last_updated : null,
+            state: currentStepIdx >= 3 ? 'done' : 'upcoming',
+            color: application.application_status === 'Approved' ? C.green
+                 : application.application_status === 'Rejected' ? C.rose
+                 : application.application_status === 'Cancelled' ? C.slate
+                 : C.muted,
+            showBadge: false,
+        },
     ];
 
     return (
         <>
             <style>{`
-                @keyframes spin { to { transform: rotate(360deg); } }
-                @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+                @keyframes spin    { to { transform: rotate(360deg); } }
+                @keyframes fadeUp  { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+                @keyframes stepPulse { 0%,100% { box-shadow:0 0 0 0 rgba(217,119,6,0.45); } 50% { box-shadow:0 0 0 6px rgba(217,119,6,0); } }
                 .ad-section { animation: fadeUp 0.3s ease both; }
             `}</style>
 
@@ -299,6 +415,23 @@ export default function ApplicationDetailsScreen() {
                                     <>
                                         <IoCloseCircle size={17} color={C.rose} />
                                         <span style={S.cancelBtnText}>Cancel Application</span>
+                                    </>
+                                )}
+                            </button>
+                        )}
+
+                        {(application.application_status === 'Rejected' || application.application_status === 'Cancelled') && (
+                            <button
+                                style={{ ...S.reapplyBtn, ...(reapplying ? { opacity: 0.6 } : {}) }}
+                                onClick={handleReapplyClick}
+                                disabled={reapplying}
+                            >
+                                {reapplying ? (
+                                    <div style={{ width: 16, height: 16, border: `2px solid rgba(30,79,216,0.3)`, borderTopColor: C.accent, borderRadius: '50%', animation: 'spin 0.6s linear infinite' }} />
+                                ) : (
+                                    <>
+                                        <IoRefreshOutline size={17} color={C.accent} />
+                                        <span style={S.reapplyBtnText}>Re-apply for this Device</span>
                                     </>
                                 )}
                             </button>
@@ -379,56 +512,55 @@ export default function ApplicationDetailsScreen() {
                         <div style={S.card}>
                             {timelineSteps.map((step, i) => (
                                 <div key={step.key} style={{ display: 'flex', gap: 0 }}>
-                                    {/* Left — dot + connector line */}
-                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 28, marginRight: 14, flexShrink: 0 }}>
+                                    {/* Dot + connector */}
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 30, marginRight: 14, flexShrink: 0 }}>
                                         <div style={{
-                                            width: 16, height: 16, borderRadius: 8, flexShrink: 0,
-                                            backgroundColor: step.inProgress ? C.amber : step.done ? step.color : C.border,
-                                            border: step.inProgress ? `3px solid ${C.amberSoft}` : step.done ? `3px solid ${step.color}22` : `2px solid ${C.mutedLight}`,
-                                            boxSizing: 'border-box',
-                                            animation: step.inProgress ? 'none' : undefined,
+                                            width: 18, height: 18, borderRadius: 9, flexShrink: 0, boxSizing: 'border-box',
+                                            backgroundColor: step.state === 'done' ? step.color : step.state === 'active' ? C.amber : C.surface,
+                                            border: step.state === 'done'   ? `3px solid ${step.color}30`
+                                                  : step.state === 'active' ? `3px solid ${C.amberSoft}`
+                                                  : `2px solid ${C.border}`,
+                                            animation: step.state === 'active' ? 'stepPulse 1.6s ease-in-out infinite' : 'none',
                                         }} />
                                         {i < timelineSteps.length - 1 && (
                                             <div style={{
-                                                width: 2, flex: 1, minHeight: 24,
-                                                backgroundColor: step.done && !step.inProgress ? step.color : C.border,
-                                                margin: '3px 0',
+                                                width: 2, flex: 1, minHeight: 28,
+                                                backgroundColor: step.state === 'done' ? step.color : C.border,
+                                                margin: '2px 0',
+                                                opacity: step.state === 'upcoming' ? 0.3 : 1,
                                             }} />
                                         )}
                                     </div>
 
-                                    {/* Right — content */}
-                                    <div style={{ flex: 1, paddingBottom: i < timelineSteps.length - 1 ? 20 : 0 }}>
-                                        {/* Label + status badge */}
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
-                                            <span style={{ fontSize: 14, fontWeight: '700', color: step.done ? C.text : C.mutedLight }}>
+                                    {/* Content */}
+                                    <div style={{ flex: 1, paddingBottom: i < timelineSteps.length - 1 ? 22 : 0 }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5, flexWrap: 'wrap' }}>
+                                            <span style={{ fontSize: 14, fontWeight: '700', color: step.state !== 'upcoming' ? C.text : C.mutedLight }}>
                                                 {step.label}
                                             </span>
-                                            {/* Status badge on the "Under Review" step */}
-                                            {step.key === 'review' && (
-                                                <div style={{
-                                                    display: 'inline-flex', alignItems: 'center', gap: 4,
-                                                    backgroundColor: meta.bg,
-                                                    padding: '3px 9px', borderRadius: 20,
-                                                }}>
+                                            {step.showBadge && (
+                                                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, backgroundColor: meta.bg, padding: '3px 9px', borderRadius: 20 }}>
                                                     <div style={{ width: 5, height: 5, borderRadius: '50%', backgroundColor: meta.dot }} />
-                                                    <span style={{ fontSize: 11, fontWeight: '700', color: meta.fg }}>
-                                                        {meta.label}
-                                                    </span>
+                                                    <span style={{ fontSize: 11, fontWeight: '700', color: meta.fg }}>{meta.label}</span>
+                                                </div>
+                                            )}
+                                            {step.state === 'upcoming' && (
+                                                <div style={{ padding: '2px 8px', borderRadius: 8, backgroundColor: C.border }}>
+                                                    <span style={{ fontSize: 10, fontWeight: '700', color: C.mutedLight }}>UPCOMING</span>
                                                 </div>
                                             )}
                                         </div>
 
-                                        {/* Sub-label */}
-                                        <p style={{ fontSize: 12, color: C.muted, lineHeight: 1.55, margin: '0 0 4px' }}>
+                                        <p style={{ fontSize: 12, color: step.state !== 'upcoming' ? C.muted : C.mutedLight, lineHeight: 1.55, margin: '0 0 5px' }}>
                                             {step.sublabel}
                                         </p>
 
-                                        {/* Date */}
                                         <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                                             <IoCalendarOutline size={11} color={C.mutedLight} />
                                             <span style={{ fontSize: 11, color: C.mutedLight }}>
-                                                {step.done ? fmtDate(step.date) : 'Pending…'}
+                                                {step.state === 'done'   ? fmtDate(step.date)
+                                                : step.state === 'active' ? 'In progress…'
+                                                : 'Pending'}
                                             </span>
                                         </div>
                                     </div>
@@ -480,7 +612,15 @@ const S = {
         backgroundColor: C.surface, padding: '11px 20px',
         borderRadius: 14, border: `1px solid #FECACA`, cursor: 'pointer',
     },
-    cancelBtnText: { color: C.rose, fontSize: 14, fontWeight: '700' },
+    cancelBtnText:  { color: C.rose, fontSize: 14, fontWeight: '700' },
+
+    reapplyBtn: {
+        display: 'flex', alignItems: 'center', gap: 8,
+        backgroundColor: C.surface, padding: '11px 20px',
+        borderRadius: 14, border: `1px solid ${C.accent}50`, cursor: 'pointer',
+        marginTop: 8,
+    },
+    reapplyBtnText: { color: C.accent, fontSize: 14, fontWeight: '700' },
 
     sectionLabel: {
         display: 'flex', alignItems: 'center', gap: 6,

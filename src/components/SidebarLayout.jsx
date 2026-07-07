@@ -18,6 +18,7 @@ import {
     IoMenuOutline,
     IoCloseOutline,
     IoChevronForward,
+    IoTimeOutline,
 } from 'react-icons/io5';
 import dojLogo from '../assets/images/Department-of-Justice-logo.jpg';
 
@@ -78,9 +79,11 @@ export default function SidebarLayout({ children, unreadCount = 0, user }) {
     const isTablet  = width >= 768 && width < 1024;
     const isMobile  = width < 768;
 
-    const [drawerOpen,   setDrawerOpen]   = useState(false);
-    const [miniExpanded, setMiniExpanded] = useState(false);
-    const [logoutDialog, setLogoutDialog] = useState(false);
+    const [drawerOpen,     setDrawerOpen]     = useState(false);
+    const [miniExpanded,   setMiniExpanded]   = useState(false);
+    const [logoutDialog,   setLogoutDialog]   = useState(false);
+    const [sessionWarning, setSessionWarning] = useState(false);
+    const [timeLeft,       setTimeLeft]       = useState(120);
 
     useEffect(() => { setDrawerOpen(false); setMiniExpanded(false); }, [location.pathname]);
 
@@ -94,6 +97,36 @@ export default function SidebarLayout({ children, unreadCount = 0, user }) {
         document.addEventListener('mousedown', h);
         return () => document.removeEventListener('mousedown', h);
     }, [isTablet]);
+
+    // ── Session expiry detection ──────────────────────────────────────────
+    useEffect(() => {
+        try {
+            const token = localStorage.getItem('clientToken');
+            if (!token) return;
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            if (!payload?.exp) return;
+            const expMs  = payload.exp * 1000;
+            const warnMs = expMs - Date.now() - 2 * 60 * 1000; // 2 min before expiry
+            if (warnMs <= 0) {
+                setSessionWarning(true);
+                setTimeLeft(Math.max(0, Math.floor((expMs - Date.now()) / 1000)));
+                return;
+            }
+            const t = setTimeout(() => {
+                setSessionWarning(true);
+                setTimeLeft(120);
+            }, warnMs);
+            return () => clearTimeout(t);
+        } catch { /* malformed token — ignore */ }
+    }, []);
+
+    // Countdown when warning is visible
+    useEffect(() => {
+        if (!sessionWarning) return;
+        if (timeLeft <= 0) { doLogout(); return; }
+        const t = setTimeout(() => setTimeLeft(prev => prev - 1), 1000);
+        return () => clearTimeout(t);
+    }, [sessionWarning, timeLeft]);
 
     const activeKey = NAV_ITEMS.find(n => location.pathname.startsWith(n.path))?.key ?? 'dashboard';
 
@@ -119,6 +152,45 @@ export default function SidebarLayout({ children, unreadCount = 0, user }) {
         localStorage.removeItem('profile_skipped');
         navigate('/login');
     };
+
+    // ── Session expiry modal ──────────────────────────────────────────────
+    const renderSessionModal = () => sessionWarning ? (
+        <>
+            <style>{`@keyframes sessionPop { from { opacity:0; transform:scale(0.92); } to { opacity:1; transform:scale(1); } }`}</style>
+            <div style={{ position: 'fixed', inset: 0, zIndex: 2000, backgroundColor: 'rgba(15,31,61,0.65)', backdropFilter: 'blur(3px)' }} />
+            <div style={{ position: 'fixed', inset: 0, zIndex: 2001, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+                <div style={{ backgroundColor: '#FFFFFF', borderRadius: 22, padding: '32px 28px', maxWidth: 380, width: '100%', boxShadow: '0 24px 64px rgba(15,31,61,0.3)', border: '1px solid #E2E8F2', display: 'flex', flexDirection: 'column', alignItems: 'center', animation: 'sessionPop 0.22s cubic-bezier(0.34,1.56,0.64,1)' }}>
+                    <div style={{ width: 66, height: 66, borderRadius: 18, backgroundColor: '#FEF3C7', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: 16 }}>
+                        <IoTimeOutline size={34} color="#D97706" />
+                    </div>
+                    <h2 style={{ fontSize: 20, fontWeight: '800', color: '#0F1F3D', margin: '0 0 6px', textAlign: 'center', letterSpacing: '-0.2px' }}>Session Expiring Soon</h2>
+                    <p style={{ fontSize: 14, color: '#64748B', textAlign: 'center', margin: '0 0 10px', lineHeight: 1.5 }}>
+                        Your session will expire in
+                    </p>
+                    <div style={{ fontSize: 42, fontWeight: '900', color: timeLeft <= 30 ? '#DC2626' : '#D97706', marginBottom: 10, fontVariantNumeric: 'tabular-nums', letterSpacing: '-1px' }}>
+                        {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}
+                    </div>
+                    <p style={{ fontSize: 12, color: '#94A3B8', textAlign: 'center', margin: '0 0 24px', lineHeight: 1.55 }}>
+                        You'll be signed out automatically when the timer reaches zero.
+                    </p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%' }}>
+                        <button
+                            style={{ backgroundColor: '#0F1F3D', padding: '13px', borderRadius: 14, border: 'none', color: '#fff', fontWeight: '700', fontSize: 14, cursor: 'pointer', width: '100%' }}
+                            onClick={doLogout}
+                        >
+                            Sign Out Now
+                        </button>
+                        <button
+                            style={{ backgroundColor: '#F4F6FA', padding: '13px', borderRadius: 14, border: '1px solid #E2E8F2', color: '#0F1F3D', fontWeight: '700', fontSize: 14, cursor: 'pointer', width: '100%' }}
+                            onClick={() => setSessionWarning(false)}
+                        >
+                            Dismiss
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </>
+    ) : null;
 
     // ── Sidebar content renderer ──────────────────────────────────────────
     const renderSidebarContent = (collapsed = false) => (
@@ -241,16 +313,13 @@ export default function SidebarLayout({ children, unreadCount = 0, user }) {
         return (
             <>
                 <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', backgroundColor: C.bg }}>
-                    {/* Sidebar: fixed height, never scrolls */}
                     <aside style={{ ...sb.sidebar, width: SIDEBAR_WIDE, flexShrink: 0 }}>
                         {renderSidebarContent(false)}
                     </aside>
-                    {/* Content: independent scroll */}
                     <main style={{ flex: 1, minWidth: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
                         {children}
                     </main>
                 </div>
-
                 <ConfirmDialog
                     config={logoutDialog ? {
                         title: 'Sign Out',
@@ -262,6 +331,7 @@ export default function SidebarLayout({ children, unreadCount = 0, user }) {
                     } : null}
                     onClose={() => setLogoutDialog(false)}
                 />
+                {renderSessionModal()}
             </>
         );
     }
@@ -315,6 +385,7 @@ export default function SidebarLayout({ children, unreadCount = 0, user }) {
                     } : null}
                     onClose={() => setLogoutDialog(false)}
                 />
+                {renderSessionModal()}
             </>
         );
     }
@@ -379,6 +450,7 @@ export default function SidebarLayout({ children, unreadCount = 0, user }) {
                 } : null}
                 onClose={() => setLogoutDialog(false)}
             />
+            {renderSessionModal()}
         </>
     );
 }
