@@ -237,4 +237,10 @@ export const notificationAPI = {
         }),
 };
 
+// ─── Client Profile API ──────────────────────────────────────────────────────
+export const clientAPI = {
+    getProfile:    ()     => api.get('/client/me'),
+    updateProfile: (data) => api.patch('/client/me', data),
+};
+
 export default api;

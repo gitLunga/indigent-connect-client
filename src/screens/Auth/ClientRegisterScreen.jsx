@@ -81,7 +81,7 @@ const validateSouthAfricanID = (idNumber) => {
     const cleanId = idNumber.replace(/\s/g, '');
     if (!/^\d{13}$/.test(cleanId)) return 'ID number must be 13 digits';
 
-    // Date-of-birth check (first 6 digits: YYMMDD)
+    // Date-of-birth check only (first 6 digits: YYMMDD)
     const year  = parseInt(cleanId.substring(0, 2));
     const month = parseInt(cleanId.substring(2, 4));
     const day   = parseInt(cleanId.substring(4, 6));
@@ -92,20 +92,6 @@ const validateSouthAfricanID = (idNumber) => {
     if (date.getFullYear() !== fullYear || date.getMonth() + 1 !== month || date.getDate() !== day)
         return 'Invalid date of birth in ID number';
     if (date > new Date()) return 'Date of birth cannot be in the future';
-
-    // Citizenship digit (index 10): 0 = SA citizen, 1 = permanent resident
-    const citizenship = parseInt(cleanId[10]);
-    if (citizenship !== 0 && citizenship !== 1)
-        return 'Invalid citizenship digit in ID number';
-
-    // Luhn checksum — South African Department of Home Affairs standard
-    const oddSum = [0,2,4,6,8,10].reduce((s, i) => s + parseInt(cleanId[i]), 0);
-    const evenDigits = [1,3,5,7,9,11].map(i => cleanId[i]).join('');
-    const evenDoubled = (parseInt(evenDigits) * 2).toString();
-    const evenSum = evenDoubled.split('').reduce((s, c) => s + parseInt(c), 0);
-    const checkDigit = (10 - ((oddSum + evenSum) % 10)) % 10;
-    if (checkDigit !== parseInt(cleanId[12]))
-        return 'ID number is not a valid South African ID (checksum failed)';
 
     return null;
 };
