@@ -13,8 +13,8 @@ import {
     IoArrowForward,
     IoChevronForward,
     IoLogInOutline,
+    IoHomeOutline,
 } from 'react-icons/io5';
-import dojLogo from '../../assets/images/Department-of-Justice-logo.jpg';
 
 const C = {
     navy:       '#0F1F3D',
@@ -32,19 +32,19 @@ const C = {
 
 const ROLES = [
     {
-        key: 'client',
-        title: 'Client User',
-        subtitle: 'Magistrates & DOJCD Staff',
-        desc: 'For department staff who need to request and manage devices through the platform.',
+        key: 'applicant',
+        title: 'Applicant',
+        subtitle: 'Indigent Households',
+        desc: 'For households applying for subsidized water, electricity, sanitation and refuse services.',
         icon: IoPersonOutline,
         color: C.accent,
         bg: C.accentSoft,
         features: [
-            { icon: IoPersonOutline,        text: 'Request new devices' },
+            { icon: IoPersonOutline,        text: 'Register your household' },
             { icon: IoDocumentTextOutline,  text: 'Track application status' },
             { icon: IoCloudUploadOutline,   text: 'Upload required documents' },
         ],
-        navigate: '/client-register',
+        navigate: '/applicant-register',
     },
 ];
 
@@ -70,7 +70,7 @@ export default function RegisterScreen() {
             <div style={S.banner}>
                 <div style={S.bannerRing} />
                 <div style={S.bannerContent}>
-                    <div style={S.emblem}><img src={dojLogo} alt="DoJ&CD" style={{ width: 44, height: 44, objectFit: 'contain', display: 'block' }} /></div>
+                    <div style={S.emblem}><IoHomeOutline size={26} color={C.accent} /></div>
                     <div>
                         <h1 style={S.bannerTitle}>Create Account</h1>
                         <p style={S.bannerSub}>Select your role to get started</p>
@@ -159,7 +159,7 @@ export default function RegisterScreen() {
                         <span style={S.loginBtnText}>Sign In to Existing Account</span>
                     </button>
 
-                    <div style={S.footerNote}>Need help? Contact support@dojcd.gov.za</div>
+                    <div style={S.footerNote}>Need help? Contact support@indigentconnect.gov.za</div>
                 </div>
             </div>
 

@@ -11,8 +11,8 @@ import {
     IoGlobeOutline,
     IoShieldCheckmarkOutline,
     IoCallOutline,
+    IoHomeOutline,
 } from 'react-icons/io5';
-import dojLogo from '../assets/images/Department-of-Justice-logo.jpg';
 
 const C = {
     navy:       '#0F1F3D',
@@ -28,7 +28,7 @@ const C = {
     green:      '#059669',
 };
 
-const REGISTER_PATHS = ['/register', '/client-register', '/operational-register'];
+const REGISTER_PATHS = ['/register', '/applicant-register'];
 const LOGIN_PATHS    = ['/login'];
 
 export default function PublicFooter() {
@@ -52,7 +52,7 @@ export default function PublicFooter() {
                     <div style={S.ctaInner}>
                         <h2 style={S.ctaTitle}>Ready to get started?</h2>
                         <p style={S.ctaDesc}>
-                            Register your account today and begin your first device application in minutes.
+                            Register your account today and submit your indigent registration application in minutes.
                         </p>
                         <div style={S.ctaBtns}>
                             <button style={S.ctaPrimary} onClick={() => navigate('/register')}>
@@ -74,15 +74,15 @@ export default function PublicFooter() {
                     {/* Brand col */}
                     <div style={S.col}>
                         <div style={S.brand}>
-                            <div style={S.brandIcon}><img src={dojLogo} alt="DoJ&CD" style={{ width: 30, height: 30, objectFit: 'contain', display: 'block' }} /></div>
+                            <div style={S.brandIcon}><IoHomeOutline size={22} color={C.accent} /></div>
                             <div>
-                                <div style={S.brandName}>DOJCD Connect</div>
-                                <div style={S.brandTagline}>Device Procurement Platform</div>
+                                <div style={S.brandName}>IndigentConnect</div>
+                                <div style={S.brandTagline}>Indigent Registration Platform</div>
                             </div>
                         </div>
                         <p style={S.brandDesc}>
-                            A digital procurement platform built for the Department of Justice &amp;
-                            Constitutional Development of South Africa.
+                            A digital registration platform built for South African municipalities to manage
+                            indigent subsidy applications for water, electricity, sanitation and refuse services.
                         </p>
                         <div style={S.shieldRow}>
                             <IoShieldCheckmarkOutline size={13} color={C.green} />
@@ -110,11 +110,11 @@ export default function PublicFooter() {
                         <div style={S.colTitle}>Contact &amp; Support</div>
                         <div style={S.contactRow}>
                             <IoMailOutline size={14} color={C.mutedLight} />
-                            <span style={S.contactText}>support@dojcd.gov.za</span>
+                            <span style={S.contactText}>support@indigentconnect.gov.za</span>
                         </div>
                         <div style={S.contactRow}>
                             <IoGlobeOutline size={14} color={C.mutedLight} />
-                            <span style={S.contactText}>www.justice.gov.za</span>
+                            <span style={S.contactText}>www.gov.za</span>
                         </div>
                         <div style={S.contactRow}>
                             <IoCallOutline size={14} color={C.mutedLight} />
@@ -130,7 +130,7 @@ export default function PublicFooter() {
                 {/* Bottom bar */}
                 <div style={S.bottomBar}>
                     <span style={S.bottomText}>
-                        © {new Date().getFullYear()} Department of Justice &amp; Constitutional Development ·
+                        © {new Date().getFullYear()} IndigentConnect · Municipal Registration System ·
                         Republic of South Africa
                     </span>
                     <span style={S.bottomVersion}>WEB v1.0.0</span>

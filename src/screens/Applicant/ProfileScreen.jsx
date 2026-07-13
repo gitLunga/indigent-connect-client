@@ -1,30 +1,26 @@
-// screens/Client/ProfileScreen.jsx
+// screens/Applicant/ProfileScreen.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authAPI, clientAPI } from '../../services/api';
+import { authAPI, applicantAPI } from '../../services/api';
 import { useToast } from '../../components/ToastProvider';
 import {
     IoPersonOutline,
     IoMailOutline,
     IoShieldCheckmarkOutline,
     IoCheckmarkCircle,
-    IoPhonePortraitOutline,
-    IoDocumentsOutline,
-    IoReceiptOutline,
     IoCardOutline,
     IoCashOutline,
     IoHomeOutline,
+    IoDocumentOutline,
     IoCloudUploadOutline,
     IoClose,
-    IoCalendarOutline,
-    IoChevronDown,
     IoCreateOutline,
     IoInformationCircleOutline,
     IoSaveOutline,
     IoCloseCircleOutline,
     IoCallOutline,
     IoLocationOutline,
-    IoBriefcaseOutline,
+    IoBusinessOutline,
 } from 'react-icons/io5';
 
 const C = {
@@ -51,46 +47,14 @@ const TITLES = [
     { value: 'Ms',   label: 'Ms'   },
     { value: 'Dr',   label: 'Dr'   },
     { value: 'Prof', label: 'Prof' },
-    { value: 'Adv',  label: 'Adv'  },
-    { value: 'Mag',  label: 'Mag'  },
-];
-
-const PROVIDERS = [
-    { value: 'MTN',     label: 'MTN'     },
-    { value: 'Vodacom', label: 'Vodacom' },
-    { value: 'Cell_C',  label: 'Cell C'  },
-    { value: 'Telkom',  label: 'Telkom'  },
-    { value: 'Rain',    label: 'Rain'    },
-];
-
-const DURATIONS = [
-    { value: '12', label: '12 Months' },
-    { value: '24', label: '24 Months' },
-    { value: '36', label: '36 Months' },
 ];
 
 const DOCS = [
-    { id: 'invoice',   key: 'invoice_file',         title: 'Service Invoice',      subtitle: 'Current mobile service invoice', icon: IoReceiptOutline,   required: true  },
-    { id: 'id',        key: 'id_document',           title: 'ID Document',          subtitle: 'Clear copy of ID or Passport',   icon: IoCardOutline,      required: true  },
-    { id: 'payslip',   key: 'payslip_document',      title: 'Latest Payslip',       subtitle: 'Most recent payslip',            icon: IoCashOutline,      required: true  },
-    { id: 'residence', key: 'residence_document',    title: 'Proof of Residence',   subtitle: 'Utility bill or bank statement', icon: IoHomeOutline,      required: false },
+    { id: 'id',         key: 'id_document',        title: 'ID Document',        subtitle: 'Clear copy of ID or Passport',        icon: IoCardOutline,   required: true  },
+    { id: 'income',     key: 'income_document',     title: 'Proof of Income',    subtitle: 'Payslip, SASSA letter, or affidavit', icon: IoCashOutline,   required: true  },
+    { id: 'residence',  key: 'residence_document',  title: 'Proof of Residence', subtitle: 'Utility bill or municipal statement', icon: IoHomeOutline,   required: false },
+    { id: 'affidavit',  key: 'affidavit_document',  title: 'Affidavit',          subtitle: 'Affidavit of inability to pay',       icon: IoDocumentOutline, required: false },
 ];
-
-const SelectField = ({ label, value, placeholder, options, onSelect, disabled }) => (
-    <div style={sf.wrap}>
-        <div style={sf.label}>{label}</div>
-        <select style={sf.select} value={value} onChange={(e) => onSelect(e.target.value)} disabled={disabled}>
-            <option value="" disabled>{placeholder}</option>
-            {options.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-        </select>
-    </div>
-);
-
-const sf = {
-    wrap:   { marginBottom: 16 },
-    label:  { fontSize: 11, fontWeight: '700', color: C.muted, letterSpacing: '0.8px', marginBottom: 8 },
-    select: { width: '100%', padding: '12px 14px', fontSize: 14, color: C.text, backgroundColor: C.bg, border: `1.5px solid ${C.border}`, borderRadius: 12, outline: 'none', cursor: 'pointer' },
-};
 
 export default function ProfileScreen() {
     const toast    = useToast();
@@ -100,9 +64,7 @@ export default function ProfileScreen() {
     const [loading,     setLoading]     = useState(false);
     const [profileDone, setProfileDone] = useState(false);
 
-    // Profile completion (initial setup)
-    const [provider,   setProvider]   = useState('');
-    const [duration,   setDuration]   = useState('');
+    // Profile completion (document upload)
     const [files,      setFiles]      = useState({});
     const [previews,   setPreviews]   = useState({});
     const fileRefs = useRef({});
@@ -118,23 +80,19 @@ export default function ProfileScreen() {
         if (!ud) { navigate('/login'); return; }
         const local = JSON.parse(ud);
         setUser(local);
-        if (local.network_provider) setProvider(local.network_provider);
-        if (local.contract_duration_months) setDuration(String(local.contract_duration_months));
-        const done = local.registration_status === 'Verified' || local.registration_status === 'Profile_Completed' || !!(local.network_provider && local.contract_duration_months);
+        const done = local.registration_status === 'Verified' || local.registration_status === 'Profile_Completed';
         setProfileDone(done);
 
         // Refresh from server
-        clientAPI.getProfile()
+        applicantAPI.getProfile()
             .then(res => {
                 const fresh = res.data?.data || res.data;
                 if (!fresh) return;
                 const merged = { ...local, ...fresh };
                 setUser(merged);
                 localStorage.setItem('user', JSON.stringify(merged));
-                const freshDone = merged.registration_status === 'Verified' || merged.registration_status === 'Profile_Completed' || !!(merged.network_provider && merged.contract_duration_months);
+                const freshDone = merged.registration_status === 'Verified' || merged.registration_status === 'Profile_Completed';
                 setProfileDone(freshDone);
-                if (merged.network_provider)         setProvider(merged.network_provider);
-                if (merged.contract_duration_months) setDuration(String(merged.contract_duration_months));
             })
             .catch(() => {/* non-fatal — stale localStorage data is fine */});
     }, []);
@@ -158,7 +116,7 @@ export default function ProfileScreen() {
         }
         setEditLoading(true);
         try {
-            const res = await clientAPI.updateProfile(editForm);
+            const res = await applicantAPI.updateProfile(editForm);
             const updated = res.data?.data || res.data;
             if (updated) {
                 const merged = { ...user, ...updated };
@@ -196,8 +154,6 @@ export default function ProfileScreen() {
     };
 
     const handleSubmit = async () => {
-        if (!provider) { toast.warning('Missing Field', 'Please select a network provider.'); return; }
-        if (!duration) { toast.warning('Missing Field', 'Please select a contract duration.'); return; }
         for (const doc of DOCS.filter(d => d.required)) {
             if (!files[doc.key]) { toast.warning('Missing Document', `${doc.title} is required.`); return; }
         }
@@ -205,31 +161,24 @@ export default function ProfileScreen() {
         setLoading(true);
         try {
             const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
-            const endDate = new Date();
-            endDate.setMonth(endDate.getMonth() + parseInt(duration, 10));
 
-            const result = await authAPI.completeProfile(currentUser.client_user_id, {
-                network_provider:         provider,
-                contract_duration_months: parseInt(duration, 10),
-                contract_end_date:        endDate.toISOString().split('T')[0],
-                invoice_file:             files.invoice_file       || null,
-                id_document:              files.id_document        || null,
-                payslip_document:         files.payslip_document   || null,
-                residence_document:       files.residence_document || null,
+            const result = await authAPI.completeProfile(currentUser.applicant_id, {
+                id_document:         files.id_document        || null,
+                income_document:     files.income_document    || null,
+                residence_document:  files.residence_document || null,
+                affidavit_document:  files.affidavit_document || null,
             });
 
             if (result.success) {
                 const updatedUser = {
                     ...currentUser,
-                    registration_status:      'Profile_Completed',
-                    network_provider:         provider,
-                    contract_duration_months: parseInt(duration, 10),
+                    registration_status: 'Profile_Completed',
                     ...(result.data?.user || {}),
                 };
                 localStorage.setItem('user', JSON.stringify(updatedUser));
                 setUser(updatedUser);
                 setProfileDone(true);
-                toast.success('Profile Completed!', result.message || 'You can now browse available devices.');
+                toast.success('Profile Completed!', result.message || 'Your documents are under review.');
             } else {
                 toast.error('Failed', result.message || 'Profile completion failed. Please try again.');
             }
@@ -321,14 +270,12 @@ export default function ProfileScreen() {
                         {/* Info rows */}
                         <div style={S.infoGrid}>
                             {[
-                                { label: 'Email Address',     value: user?.email || '—',                 icon: IoMailOutline        },
-                                { label: 'Phone Number',      value: user?.phone_number || 'Not set',    icon: IoCallOutline        },
-                                { label: 'User Type',         value: user?.user_type || '—',             icon: IoBriefcaseOutline   },
-                                { label: 'PERSAL ID',         value: user?.persal_id || '—',             icon: IoCardOutline        },
-                                { label: 'Region',            value: user?.region || '—',                icon: IoLocationOutline    },
-                                { label: 'Account Status',    value: (user?.registration_status || '—').replace('_', ' '), icon: IoShieldCheckmarkOutline },
-                                { label: 'Network Provider',  value: user?.network_provider || 'Not set', icon: IoPhonePortraitOutline },
-                                { label: 'Contract Duration', value: user?.contract_duration_months ? `${user.contract_duration_months} Months` : 'Not set', icon: IoCalendarOutline },
+                                { label: 'Email Address',  value: user?.email || '—',              icon: IoMailOutline        },
+                                { label: 'Phone Number',   value: user?.phone_number || 'Not set',  icon: IoCallOutline        },
+                                { label: 'ID Number',      value: user?.id_number || '—',           icon: IoCardOutline        },
+                                { label: 'Region',         value: user?.region || '—',              icon: IoLocationOutline    },
+                                { label: 'Municipal Ward / Office', value: user?.department_id || 'Not set', icon: IoBusinessOutline },
+                                { label: 'Account Status', value: (user?.registration_status || '—').replace('_', ' '), icon: IoShieldCheckmarkOutline },
                             ].map((row, i) => {
                                 const Icon = row.icon;
                                 return (
@@ -366,27 +313,18 @@ export default function ProfileScreen() {
                     <section>
                         <div style={S.sectionHeader}>
                             <h2 style={S.sectionTitle}>Complete Your Profile</h2>
-                            <div style={S.requiredBadge}>Required to apply for devices</div>
+                            <div style={S.requiredBadge}>Required to submit an application</div>
                         </div>
 
                         <div style={S.infoBanner}>
                             <IoInformationCircleOutline size={16} color={C.accent} />
                             <span style={S.infoBannerText}>
-                                Upload the required documents and select your preferences below.
-                                Your profile will be reviewed before you can apply for devices.
+                                Upload the required supporting documents below. Your profile will be reviewed
+                                before you can submit your indigent registration application.
                             </span>
                         </div>
 
                         <div style={S.formCard}>
-                            <div style={S.formRow}>
-                                <div style={{ flex: 1 }}>
-                                    <SelectField label="NETWORK PROVIDER" value={provider} placeholder="Select provider" options={PROVIDERS} onSelect={setProvider} disabled={loading} />
-                                </div>
-                                <div style={{ flex: 1 }}>
-                                    <SelectField label="CONTRACT DURATION" value={duration} placeholder="Select duration" options={DURATIONS} onSelect={setDuration} disabled={loading} />
-                                </div>
-                            </div>
-
                             <div style={S.docsLabel}>DOCUMENTS</div>
                             <div style={S.docsGrid}>
                                 {DOCS.map(doc => {
@@ -454,10 +392,10 @@ export default function ProfileScreen() {
                             <div style={S.completedTitle}>Profile Submitted</div>
                             <div style={S.completedSub}>
                                 Your profile has been submitted and is under review. You'll be notified when your
-                                eligibility is confirmed.
+                                account is verified so you can submit your application.
                             </div>
-                            <button style={S.completedBtn} onClick={() => navigate('/device-catalog')}>
-                                Browse Devices
+                            <button style={S.completedBtn} onClick={() => navigate('/applicant-dashboard')}>
+                                Go to Dashboard
                             </button>
                         </div>
                     </section>
@@ -520,7 +458,6 @@ const S = {
     infoBannerText: { fontSize: 13, color: '#1E3A8A', lineHeight: 1.6 },
 
     formCard: { backgroundColor: C.surface, borderRadius: 16, border: `1px solid ${C.border}`, padding: '20px' },
-    formRow:  { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 4 },
 
     docsLabel: { fontSize: 11, fontWeight: '700', color: C.muted, letterSpacing: '0.8px', marginBottom: 10 },
     docsGrid:  { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 10, marginBottom: 20 },

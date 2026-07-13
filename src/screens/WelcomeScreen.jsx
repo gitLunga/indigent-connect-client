@@ -1,7 +1,6 @@
 // screens/WelcomeScreen.jsx
-// Redesigned: full-width modern hero, Platform Capabilities section,
-// Who Uses DOJCD Connect section, CTA banner, and shared footer.
-// All original API logic preserved exactly.
+// Full-width modern hero, Platform Capabilities section,
+// Who Uses IndigentConnect section, CTA banner, and shared footer.
 
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -10,7 +9,7 @@ import { useToast } from '../components/ToastProvider';
 import PublicNavbar from '../components/PublicNavbar';
 import PublicFooter from '../components/PublicFooter';
 import {
-    IoPhonePortraitOutline,
+    IoHomeOutline,
     IoCheckmarkCircleOutline,
     IoAnalyticsOutline,
     IoShieldCheckmarkOutline,
@@ -22,10 +21,8 @@ import {
     IoGlobeOutline,
     IoTimeOutline,
     IoArrowDownOutline,
-    IoBriefcaseOutline,
-    IoGridOutline,
+    IoAccessibilityOutline,
 } from 'react-icons/io5';
-import dojLogo from '../assets/images/Department-of-Justice-logo.jpg';
 
 // ─── Design tokens ──────────────────────────────────────────────────────────
 const C = {
@@ -51,22 +48,22 @@ const C = {
 // ─── Data ────────────────────────────────────────────────────────────────────
 const CAPABILITIES = [
     {
-        icon: IoPhonePortraitOutline,
+        icon: IoHomeOutline,
         color: C.accent, bg: C.accentSoft,
-        title: 'Device Procurement',
-        desc: 'Browse an approved catalogue of devices, view contract details, monthly costs, and submit applications — fully paperless.',
+        title: 'Indigent Registration',
+        desc: 'Register your household, upload supporting documents, and submit your subsidy application — fully paperless.',
     },
     {
         icon: IoCheckmarkCircleOutline,
         color: C.green, bg: C.greenSoft,
-        title: 'Multi-Level Approval',
-        desc: 'Every application passes through a structured review chain with full audit trails and real-time status updates.',
+        title: 'Means-Test Assessment',
+        desc: 'Every application passes through intake review and a means-test assessment with full audit trails and real-time status updates.',
     },
     {
         icon: IoAnalyticsOutline,
         color: C.purple, bg: C.purpleSoft,
         title: 'Real-Time Tracking',
-        desc: 'Monitor every stage of your request from submission to final approval through a live status dashboard.',
+        desc: 'Monitor every stage of your application from submission to final decision through a live status dashboard.',
     },
     {
         icon: IoNotificationsOutline,
@@ -89,10 +86,10 @@ const CAPABILITIES = [
 ];
 
 const USER_TYPES = [
-    { icon: IoShieldCheckmarkOutline, color: '#1E4FD8', bg: '#EBF0FF', title: 'Magistrates',           desc: 'Senior court officials eligible for departmentally-issued devices.' },
-    { icon: IoBriefcaseOutline,       color: '#059669', bg: '#D1FAE5', title: 'Advocates',             desc: 'State advocates and prosecutors working within DOJCD courts.' },
-    { icon: IoPeopleOutline,          color: '#7C3AED', bg: '#EDE9FE', title: 'Administrative Staff',  desc: 'Department personnel requiring devices for daily operations.' },
-    { icon: IoServerOutline,          color: '#D97706', bg: '#FEF3C7', title: 'ICT & Operations',      desc: 'Internal teams responsible for procurement and device management.' },
+    { icon: IoHomeOutline,            color: '#1E4FD8', bg: '#EBF0FF', title: 'Indigent Households',   desc: 'Households unable to afford municipal services applying for subsidized rates.' },
+    { icon: IoAccessibilityOutline,   color: '#059669', bg: '#D1FAE5', title: 'Pensioners & People with Disabilities', desc: 'Applicants relying on a state grant or disability income.' },
+    { icon: IoPeopleOutline,          color: '#7C3AED', bg: '#EDE9FE', title: 'Unemployed Residents',  desc: 'Residents with no or low income who qualify for the indigent subsidy.' },
+    { icon: IoServerOutline,          color: '#D97706', bg: '#FEF3C7', title: 'Municipal Staff',       desc: 'Intake clerks and assessment officers who review and approve applications.' },
 ];
 
 const STATS = [
@@ -181,21 +178,21 @@ export default function WelcomeScreen() {
                     <div className="wc0" style={S.heroEmblemWrap}>
                         <div style={S.heroGlow} />
                         <div style={S.heroEmblem}>
-                            <img src={dojLogo} alt="Department of Justice & Constitutional Development" style={{ width: 90, height: 90, objectFit: 'contain', display: 'block' }} />
+                            <IoHomeOutline size={54} color={C.accent} />
                         </div>
                     </div>
 
                     {/* Headline */}
                     <h1 className="wc1" style={S.heroTitle}>
-                        DOJCD Connect
+                        IndigentConnect
                     </h1>
                     <p className="wc1" style={S.heroSubtitle}>
-                        Device Procurement Platform
+                        Indigent Registration Platform
                     </p>
                     <p className="wc2" style={S.heroDesc}>
-                        A modern, end-to-end digital platform enabling magistrates and Department of Justice &amp;
-                        Constitutional Development staff across South Africa to request, track, and manage
-                        mobile devices — fully online, fully transparent.
+                        A modern, end-to-end digital platform enabling South African households to register,
+                        apply for subsidized water, electricity, sanitation and refuse services, and track
+                        their application — fully online, fully transparent.
                     </p>
 
                     {/* CTA buttons */}
@@ -260,7 +257,7 @@ export default function WelcomeScreen() {
                         <div style={S.sectionBadge}>CAPABILITIES</div>
                         <h2 style={S.sectionTitle}>Platform Capabilities</h2>
                         <p style={S.sectionDesc}>
-                            Everything you need to manage device procurement — from first request to final approval.
+                            Everything you need to manage your indigent registration — from first application to final decision.
                         </p>
                     </div>
 
@@ -282,7 +279,7 @@ export default function WelcomeScreen() {
             </section>
 
             {/* ═══════════════════════════════════════════════════════
-                WHO USES DOJCD CONNECT SECTION
+                WHO USES INDIGENTCONNECT SECTION
             ═══════════════════════════════════════════════════════ */}
             <section style={{ ...S.section, backgroundColor: C.navy }}>
                 <div style={S.sectionInner}>
@@ -290,10 +287,10 @@ export default function WelcomeScreen() {
                         <div style={{ ...S.sectionBadge, color: 'rgba(255,255,255,0.5)', borderColor: 'rgba(255,255,255,0.12)', backgroundColor: 'rgba(255,255,255,0.06)' }}>
                             WHO IT'S FOR
                         </div>
-                        <h2 style={{ ...S.sectionTitle, color: '#fff' }}>Who Uses DOJCD Connect?</h2>
+                        <h2 style={{ ...S.sectionTitle, color: '#fff' }}>Who Uses IndigentConnect?</h2>
                         <p style={{ ...S.sectionDesc, color: 'rgba(255,255,255,0.55)' }}>
-                            Built exclusively for verified Department of Justice &amp; Constitutional Development
-                            personnel across all nine provinces of South Africa.
+                            Built for indigent households and the municipal staff who assess their applications
+                            across all nine provinces of South Africa.
                         </p>
                     </div>
 
@@ -315,7 +312,7 @@ export default function WelcomeScreen() {
                     <div style={S.eligNote}>
                         <IoShieldCheckmarkOutline size={16} color={C.green} />
                         <span style={S.eligText}>
-                            All users must be registered DOJCD employees with a valid PERSAL ID and departmental email address.
+                            All applicants must provide a valid South African ID number and proof of income to be verified.
                         </span>
                     </div>
                 </div>

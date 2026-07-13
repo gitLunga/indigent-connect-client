@@ -38,7 +38,7 @@ const api = axios.create({
 api.interceptors.request.use(
     (config) => {
         console.log(`📡 ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`);
-        const token = localStorage.getItem('clientToken');
+        const token = localStorage.getItem('applicantToken');
         if (token) config.headers.Authorization = `Bearer ${token}`;
         return config;
     },
@@ -80,36 +80,11 @@ api.interceptors.response.use(
     }
 );
 
-// Helper to convert file objects (web uses File, not uri)
-const prepareFileForUpload = (file) => {
-    if (!file) return undefined;
-    // If it's a File object (web), return as is
-    if (file instanceof File) return file;
-    // If it has a uri (React Native legacy) – you can remove this if not needed
-    if (file.uri) {
-        console.warn('⚠️ Received React Native file object – convert to File before calling');
-        return file;
-    }
-    return file;
-};
-
 // ─── Auth API ────────────────────────────────────────────────────────────────
 export const authAPI = {
-    registerClient: async (userData) => {
+    registerApplicant: async (userData) => {
         try {
-            // Remove profile completion fields (they belong to step 2)
-            const {
-                network_provider,
-                contract_duration_months,
-                contract_end_date,
-                invoice_file,
-                id_document,
-                payslip_document,
-                residence_document,
-                ...basicUserData
-            } = userData;
-
-            const response = await api.post('/auth/register', basicUserData);
+            const response = await api.post('/auth/register', userData);
             return response.data;
         } catch (error) {
             console.error('🔴 Registration error:', error);
@@ -117,33 +92,29 @@ export const authAPI = {
         }
     },
 
-    completeProfile: async (clientUserId, profileData) => {
+    // Uploads supporting documents (ID, proof of income required; proof of
+    // residence and affidavit optional) and marks the profile ready for intake review.
+    completeProfile: async (applicantId, profileData) => {
         try {
-            console.log('📤 Starting profile completion for user:', clientUserId);
+            console.log('📤 Starting profile completion for applicant:', applicantId);
 
             const formData = new FormData();
 
-            // Add text fields
-            formData.append('network_provider', profileData.network_provider);
-            formData.append('contract_duration_months', profileData.contract_duration_months.toString());
-            formData.append('contract_end_date', profileData.contract_end_date);
-
-            // Append files (web expects File objects)
-            if (profileData.invoice_file && profileData.invoice_file instanceof File) {
-                formData.append('invoice_file', profileData.invoice_file);
-            }
-            if (profileData.id_document && profileData.id_document instanceof File) {
+            if (profileData.id_document instanceof File) {
                 formData.append('id_document', profileData.id_document);
             }
-            if (profileData.payslip_document && profileData.payslip_document instanceof File) {
-                formData.append('payslip_document', profileData.payslip_document);
+            if (profileData.income_document instanceof File) {
+                formData.append('income_document', profileData.income_document);
             }
-            if (profileData.residence_document && profileData.residence_document instanceof File) {
+            if (profileData.residence_document instanceof File) {
                 formData.append('residence_document', profileData.residence_document);
+            }
+            if (profileData.affidavit_document instanceof File) {
+                formData.append('affidavit_document', profileData.affidavit_document);
             }
 
             const response = await api.post(
-                `/auth/complete-profile/${clientUserId}`,
+                `/auth/complete-profile/${applicantId}`,
                 formData,
                 {
                     headers: { 'Content-Type': 'multipart/form-data' },
@@ -158,8 +129,6 @@ export const authAPI = {
             throw error;
         }
     },
-
-    registerOperational: (userData) => api.post('/auth/register-operational', userData),
 
     login: async (loginData) => {
         try {
@@ -176,43 +145,22 @@ export const authAPI = {
     testConnection: () => api.get('/test'),
 };
 
-// ─── Admin API ──────────────────────────────────────────────────────────────
-export const adminAPI = {
-    getAllUsers: () => api.get('/admin/all-users'),
-    getAllClientUsers: () => api.get('/admin/client-users'),
-    getClientUserById: (id) => api.get(`/admin/client-users/${id}`),
-    updateClientUserStatus: (id, data) => api.patch(`/admin/client-users/${id}/status`, data),
-    getAllOperationalUsers: () => api.get('/admin/operational-users'),
-    getOperationalUserById: (id) => api.get(`/admin/operational-users/${id}`),
-    getUserStatistics: () => api.get('/admin/statistics'),
-    getDashboardData: () => api.get('/admin/dashboard'),
-    getRecentRegistrations: () => api.get('/admin/recent-registrations'),
-    searchUsers: (query) => api.get(`/admin/search?query=${query}`),
-    loginAdmin: (loginData) => api.post('/auth/login-operational', loginData),
-};
-
-// ─── Device API ─────────────────────────────────────────────────────────────
-export const deviceAPI = {
-    getAvailableDevices: () => api.get('/applications/devices'),
-    getDeviceDetails: (deviceId) => api.get(`/applications/devices/${deviceId}`),
-    submitApplication: (clientUserId, deviceId) =>
-        api.post('/applications/applications', {
-            client_user_id: clientUserId,
-            device_id: deviceId,
-        }),
-    getUserApplications: (clientUserId) =>
-        api.get(`/applications/users/${clientUserId}/applications`),
-    getApplicationDetails: (clientUserId, applicationId) =>
-        api.get(`/applications/users/${clientUserId}/applications/${applicationId}`),
-    cancelApplication: (clientUserId, applicationId) =>
-        api.put(`/applications/users/${clientUserId}/applications/${applicationId}/cancel`),
-    resubmitApplication: (clientUserId, applicationId, deviceId = null) =>
-        api.post(`/applications/users/${clientUserId}/applications/${applicationId}/resubmit`,
-            deviceId ? { device_id: deviceId } : {}),
-    getApplicationSummary: (clientUserId) =>
-        api.get(`/applications/users/${clientUserId}/applications/summary`),
-    checkEligibility: (clientUserId) =>
-        api.get(`/applications/users/${clientUserId}/eligibility`),
+// ─── Application API ─────────────────────────────────────────────────────────
+export const applicationAPI = {
+    submitApplication: (applicantId) =>
+        api.post('/applications/applications', { applicant_id: applicantId }),
+    getUserApplications: (applicantId) =>
+        api.get(`/applications/users/${applicantId}/applications`),
+    getApplicationDetails: (applicantId, applicationId) =>
+        api.get(`/applications/users/${applicantId}/applications/${applicationId}`),
+    cancelApplication: (applicantId, applicationId) =>
+        api.put(`/applications/users/${applicantId}/applications/${applicationId}/cancel`),
+    resubmitApplication: (applicantId, applicationId) =>
+        api.post(`/applications/users/${applicantId}/applications/${applicationId}/resubmit`),
+    getApplicationSummary: (applicantId) =>
+        api.get(`/applications/users/${applicantId}/applications/summary`),
+    checkEligibility: (applicantId) =>
+        api.get(`/applications/users/${applicantId}/eligibility`),
 };
 
 // ─── Notification API ───────────────────────────────────────────────────────
@@ -237,10 +185,10 @@ export const notificationAPI = {
         }),
 };
 
-// ─── Client Profile API ──────────────────────────────────────────────────────
-export const clientAPI = {
-    getProfile:    ()     => api.get('/client/me'),
-    updateProfile: (data) => api.patch('/client/me', data),
+// ─── Applicant Profile API ────────────────────────────────────────────────────
+export const applicantAPI = {
+    getProfile:    ()     => api.get('/applicant/me'),
+    updateProfile: (data) => api.patch('/applicant/me', data),
 };
 
 export default api;

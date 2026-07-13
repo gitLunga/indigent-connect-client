@@ -7,29 +7,23 @@
  * @property {string} email
  * @property {string} [phone_number]
  * @property {string} [region]
- * @property {string} [persal_id]
+ * @property {string} id_number
  * @property {string} [department_id]
- * @property {'Advocate'|'Magistrate'} [user_type]
- * @property {'Admin'|'MTN_Staff'|'Warehouse'|'Approver'} [user_role]
  * @property {string} password
  */
 
 /**
- * @typedef {Object} ClientUser
- * @property {number} client_user_id
+ * @typedef {Object} Applicant
+ * @property {number} applicant_id
  * @property {string} [title]
  * @property {string} first_name
  * @property {string} last_name
  * @property {string} email
  * @property {string} [phone_number]
  * @property {string} [region]
- * @property {string} [persal_id]
+ * @property {string} id_number
  * @property {string} [department_id]
- * @property {'Advocate'|'Magistrate'} user_type
- * @property {string} [network_provider]
- * @property {number} [contract_duration_months]
- * @property {string} [contract_end_date]
- * @property {'Pending'|'Profile_Completed'|'Verified'|'Rejected'} registration_status
+ * @property {'Pending'|'Profile_Completed'|'Verified'|'Rejected'|'Deactivated'} registration_status
  * @property {string} [verification_notes]
  * @property {string} created_at
  */
@@ -41,7 +35,7 @@
  * @property {string} first_name
  * @property {string} last_name
  * @property {string} email
- * @property {'Admin'|'MTN_Staff'|'Warehouse'|'Approver'} user_role
+ * @property {'Admin'|'Intake_Clerk'|'Assessment_Officer'|'Supervisor'} user_role
  * @property {string} password
  * @property {string} created_at
  */
@@ -56,20 +50,10 @@
 
 /**
  * @typedef {Object} CompleteProfileData
- * @property {string} network_provider
- * @property {number} contract_duration_months
- * @property {string} contract_end_date
- * @property {FileData} [invoice_file]
- * @property {FileData} [id_document]
- * @property {FileData} [payslip_document]
+ * @property {FileData} id_document
+ * @property {FileData} income_document
  * @property {FileData} [residence_document]
- */
-
-/**
- * @typedef {Object} UploadInvoiceData
- * @property {string} file_data
- * @property {string} filename
- * @property {string} [mime_type]
+ * @property {FileData} [affidavit_document]
  */
 
 /**
@@ -79,96 +63,32 @@
  */
 
 /**
- * @typedef {Object} SystemUser
- * @property {number} id
- * @property {'client'|'operational'} user_type
- * @property {string|null} [user_role]
- * @property {string|null} [title]
- * @property {string} first_name
- * @property {string} last_name
- * @property {string} email
- * @property {string|null} [phone_number]
- * @property {string|null} [region]
- * @property {string|null} [persal_id]
- * @property {string|null} [department_id]
- * @property {'Pending'|'Profile_Completed'|'Verified'|'Rejected'|null} [registration_status]
+ * @typedef {Object} Application
+ * @property {number} application_id
+ * @property {number} applicant_id
+ * @property {'Pending'|'Pending_Assessment'|'Approved'|'Rejected'|'Cancelled'} application_status
+ * @property {string} submission_date
+ * @property {string} last_updated
+ * @property {string} [rejection_reason]
+ * @property {number} [parent_application_id]
+ */
+
+/**
+ * @typedef {Object} ApplicationSummary
+ * @property {number} total_applications
+ * @property {number} pending
+ * @property {number} approved
+ * @property {number} rejected
+ * @property {number} cancelled
+ */
+
+/**
+ * @typedef {Object} Notification
+ * @property {number} notification_id
+ * @property {number} user_id
+ * @property {'Applicant'|'Operational'} user_type
+ * @property {string} title
+ * @property {string} message
+ * @property {boolean} is_read
  * @property {string} created_at
- */
-
-/**
- * @typedef {Object} UserStats
- * @property {Object} client_users
- * @property {Array<{registration_status: string, count: string}>} client_users.stats
- * @property {number} client_users.total
- * @property {number} [client_users.this_month]
- * @property {Object} operational_users
- * @property {Array<{user_role: string, count: string}>} operational_users.stats
- * @property {number} operational_users.total
- * @property {number} total_users
- */
-
-/**
- * @typedef {Object} UpdateUserStatusData
- * @property {'Pending'|'Verified'|'Rejected'} status
- * @property {string} notes
- */
-
-/**
- * @typedef {Object} FileObject
- * @property {string} uri
- * @property {string} name
- * @property {string} [type]
- * @property {number} [size]
- */
-
-/**
- * @typedef {Object} CombinedUser
- * @property {number} id
- * @property {'client'|'operational'} user_category
- * @property {string} role
- * @property {string} [title]
- * @property {string} first_name
- * @property {string} last_name
- * @property {string} email
- * @property {string} [phone_number]
- * @property {string} [region]
- * @property {string} created_at
- */
-
-/**
- * @typedef {Object} RecentRegistration
- * @property {'client'|'operational'} user_type
- * @property {number} id
- * @property {string} first_name
- * @property {string} last_name
- * @property {string} email
- * @property {string} registration_status
- * @property {string} created_at
- */
-
-/**
- * @typedef {Object} SearchResult
- * @property {'client'|'operational'} user_type
- * @property {number} id
- * @property {string} first_name
- * @property {string} last_name
- * @property {string} email
- * @property {string} [phone_number]
- * @property {string} [persal_id]
- * @property {string} registration_status
- * @property {string} [client_user_type]
- */
-
-/**
- * @typedef {Object} DashboardData
- * @property {UserStats} statistics
- * @property {RecentRegistration[]} recent_registrations
- * @property {ActivitySummary} activity_summary
- */
-
-/**
- * @typedef {Object} ActivitySummary
- * @property {Array<{client_user_id: number, first_name: string, last_name: string, application_count: number}>} top_applicants
- * @property {Array<{client_user_id: number, first_name: string, last_name: string, order_count: number}>} top_ordered_users
- * @property {number} active_contracts
  */

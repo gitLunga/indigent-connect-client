@@ -1,6 +1,6 @@
 // components/ConfirmDialog.jsx
 // Reusable confirmation popup. Replaces all window.confirm() calls
-// across the app. Used for: logout, apply for device, cancel application, etc.
+// across the app. Used for: logout, submit application, cancel application, etc.
 //
 // Usage:
 //   const [dialog, setDialog] = useState(null);

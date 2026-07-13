@@ -1,10 +1,9 @@
-// screens/Client/MyApplicationsScreen.jsx
-// Updated: ConfirmDialog replaces window.confirm for cancelling applications.
-// All original API logic preserved exactly.
+// screens/Applicant/MyApplicationsScreen.jsx
+// ConfirmDialog replaces window.confirm for submitting/cancelling/resubmitting applications.
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { deviceAPI } from '../../services/api';
+import { applicationAPI } from '../../services/api';
 import { useToast } from '../../components/ToastProvider';
 import ConfirmDialog from '../../components/ConfirmDialog';
 import { Sk, SkeletonShimmerStyle } from '../../components/SkeletonLoader';
@@ -15,8 +14,6 @@ import {
     IoCloseCircleOutline,
     IoBanOutline,
     IoDocumentTextOutline,
-    IoCashOutline,
-    IoCalendarOutline,
     IoAdd,
     IoChevronForward,
     IoAlertCircleOutline,
@@ -44,16 +41,16 @@ const C = {
 };
 
 const STATUS_META = {
-    Approved:        { bg: C.greenSoft, fg: C.green,   dot: C.green },
-    Pending:         { bg: C.amberSoft, fg: C.amber,   dot: C.amber },
-    Pending_Finance: { bg: '#EDE9FE',   fg: '#7C3AED', dot: '#7C3AED' },
-    Rejected:        { bg: C.roseSoft,  fg: C.rose,    dot: C.rose },
-    Cancelled:       { bg: C.slateSoft, fg: C.slate,   dot: C.slate },
+    Approved:           { bg: C.greenSoft, fg: C.green,   dot: C.green },
+    Pending:            { bg: C.amberSoft, fg: C.amber,   dot: C.amber },
+    Pending_Assessment: { bg: '#EDE9FE',   fg: '#7C3AED', dot: '#7C3AED' },
+    Rejected:           { bg: C.roseSoft,  fg: C.rose,    dot: C.rose },
+    Cancelled:          { bg: C.slateSoft, fg: C.slate,   dot: C.slate },
 };
 
 const StatusChip = ({ status }) => {
     const m     = STATUS_META[status] || { bg: C.slateSoft, fg: C.slate, dot: C.slate };
-    const label = status === 'Pending_Finance' ? 'In Finance' : status;
+    const label = status === 'Pending_Assessment' ? 'In Assessment' : status;
     return (
         <div style={{ display: 'flex', alignItems: 'center', padding: '5px 10px', borderRadius: 20, backgroundColor: m.bg, border: `1px solid ${m.dot}28`, flexShrink: 0 }}>
             <div style={{ width: 6, height: 6, borderRadius: 3, marginRight: 6, backgroundColor: m.dot }} />
@@ -63,12 +60,12 @@ const StatusChip = ({ status }) => {
 };
 
 const FILTERS = [
-    { key: 'All',             icon: IoAppsOutline },
-    { key: 'Pending',         icon: IoTimeOutline },
-    { key: 'Pending_Finance', icon: IoTimeOutline },
-    { key: 'Approved',        icon: IoCheckmarkCircleOutline },
-    { key: 'Rejected',        icon: IoCloseCircleOutline },
-    { key: 'Cancelled',       icon: IoBanOutline },
+    { key: 'All',                icon: IoAppsOutline },
+    { key: 'Pending',            icon: IoTimeOutline },
+    { key: 'Pending_Assessment', icon: IoTimeOutline },
+    { key: 'Approved',           icon: IoCheckmarkCircleOutline },
+    { key: 'Rejected',           icon: IoCloseCircleOutline },
+    { key: 'Cancelled',          icon: IoBanOutline },
 ];
 
 export default function MyApplicationsScreen() {
@@ -90,7 +87,7 @@ export default function MyApplicationsScreen() {
             if (!userStr) { navigate('/login'); return; }
             const u = JSON.parse(userStr);
             setUser(u);
-            const r = await deviceAPI.getUserApplications(u.client_user_id);
+            const r = await applicationAPI.getUserApplications(u.applicant_id);
             // Safely extract array regardless of API response shape
             const raw = r?.data?.data;
             let list = [];
@@ -115,11 +112,33 @@ export default function MyApplicationsScreen() {
         setRefreshing(false);
     };
 
+    const handleNewApplicationClick = () => {
+        setDialog({
+            title: 'Submit Application',
+            message: 'Are you sure you want to submit a new indigent registration application for review?',
+            confirmText: 'Yes, Submit',
+            cancelText: 'Not yet',
+            variant: 'success',
+            onConfirm: submitNewApplication,
+        });
+    };
+
+    const submitNewApplication = async () => {
+        if (!user?.applicant_id) { toast.error('Error', 'User not found.'); return; }
+        try {
+            const r = await applicationAPI.submitApplication(user.applicant_id);
+            toast.success('Application Submitted', r.data?.message || 'Your application has been submitted successfully.');
+            await loadApplications();
+        } catch (error) {
+            toast.error('Submission Failed', error.response?.data?.message || error.message || 'Please try again.');
+        }
+    };
+
     // Show confirm dialog before cancelling
     const handleCancelClick = (app) => {
         setDialog({
             title: 'Cancel Application',
-            message: `Cancel your application for the ${app.device_name}?`,
+            message: `Cancel your application #${app.application_id}?`,
             details: 'This action cannot be undone. Your application will be permanently cancelled.',
             confirmText: 'Yes, Cancel It',
             cancelText: 'Keep Application',
@@ -129,9 +148,9 @@ export default function MyApplicationsScreen() {
     };
 
     const submitCancel = async (applicationId) => {
-        if (!user?.client_user_id) { toast.error('Error', 'User not found.'); return; }
+        if (!user?.applicant_id) { toast.error('Error', 'User not found.'); return; }
         try {
-            const r = await deviceAPI.cancelApplication(user.client_user_id, applicationId);
+            const r = await applicationAPI.cancelApplication(user.applicant_id, applicationId);
             if (r.data.success) {
                 toast.success('Cancelled', r.data.message || 'Application cancelled.');
                 await loadApplications();
@@ -149,19 +168,19 @@ export default function MyApplicationsScreen() {
     const handleResubmitClick = (app) => {
         setDialog({
             title: 'Resubmit Application',
-            message: `Resubmit your application for the ${app.device_name}?`,
-            details: 'A new application will be created for the same device and sent for review.',
+            message: `Resubmit application #${app.application_id}?`,
+            details: 'A new application will be created and sent for intake review.',
             confirmText: 'Yes, Resubmit',
             cancelText: 'Not Now',
-            variant: 'primary',
+            variant: 'default',
             onConfirm: () => submitResubmit(app.application_id),
         });
     };
 
     const submitResubmit = async (applicationId) => {
-        if (!user?.client_user_id) { toast.error('Error', 'User not found.'); return; }
+        if (!user?.applicant_id) { toast.error('Error', 'User not found.'); return; }
         try {
-            const r = await deviceAPI.resubmitApplication(user.client_user_id, applicationId);
+            const r = await applicationAPI.resubmitApplication(user.applicant_id, applicationId);
             if (r.data.success) {
                 toast.success('Resubmitted', r.data.message || 'Application resubmitted.');
                 await loadApplications();
@@ -194,30 +213,17 @@ export default function MyApplicationsScreen() {
                 <div style={S.appInner}>
                     <div style={S.appTop}>
                         <div style={{ flex: 1, minWidth: 0, marginRight: 10 }}>
-                            <div style={S.appDevice}>{item.device_name}</div>
-                            <div style={S.appModel}>{item.model} · {item.manufacturer}</div>
+                            <div style={S.appDevice}>Application #{item.application_id}</div>
+                            <div style={S.appModel}>
+                                Submitted {new Date(item.submission_date).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })}
+                            </div>
                         </div>
                         <StatusChip status={item.application_status} />
                     </div>
 
-                    <div style={S.pillRow}>
-                        <div style={S.pill}>
-                            <IoDocumentTextOutline size={12} color={C.muted} />
-                            <span style={S.pillText}>{item.plan_name}</span>
-                        </div>
-                        <div style={{ ...S.pill, backgroundColor: C.greenSoft }}>
-                            <IoCashOutline size={12} color={C.green} />
-                            <span style={{ ...S.pillText, color: C.green, fontWeight: '700' }}>R{item.monthly_cost}/mo</span>
-                        </div>
-                        <div style={S.pill}>
-                            <IoCalendarOutline size={12} color={C.muted} />
-                            <span style={S.pillText}>{item.contract_duration_months}mo</span>
-                        </div>
-                    </div>
-
                     <div style={S.appFooter}>
                         <div style={S.appDate}>
-                            Applied {new Date(item.submission_date).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })}
+                            Last updated {new Date(item.last_updated).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })}
                         </div>
                         <div style={S.appFooterRight}>
                             {item.application_status === 'Pending' && (
@@ -292,11 +298,6 @@ export default function MyApplicationsScreen() {
                                         </div>
                                         <Sk w={72} h={24} r={12} />
                                     </div>
-                                    <div style={{ display: 'flex', gap: 6 }}>
-                                        <Sk w={88} h={24} r={8} />
-                                        <Sk w={78} h={24} r={8} />
-                                        <Sk w={58} h={24} r={8} />
-                                    </div>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                         <Sk w={100} h={11} r={5} />
                                         <Sk w={42} h={16} r={6} />
@@ -330,9 +331,9 @@ export default function MyApplicationsScreen() {
                         </div>
                     </div>
                     <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                        <button style={S.browseBtn} onClick={() => navigate('/device-catalog')}>
+                        <button style={S.browseBtn} onClick={handleNewApplicationClick}>
                             <IoAdd size={16} color="#fff" />
-                            <span style={S.browseBtnText}>Browse Devices</span>
+                            <span style={S.browseBtnText}>New Application</span>
                         </button>
                         <button style={S.iconBtn} onClick={onRefresh} disabled={refreshing}>
                             <IoRefreshOutline size={17} color="rgba(255,255,255,0.7)"
@@ -355,7 +356,9 @@ export default function MyApplicationsScreen() {
                                     onClick={() => setFilter(f.key)}
                                 >
                                     <Icon size={13} color={active ? '#fff' : C.muted} />
-                                    <span style={{ fontSize: 12, fontWeight: '600', color: active ? '#fff' : C.muted }}>{f.key}</span>
+                                    <span style={{ fontSize: 12, fontWeight: '600', color: active ? '#fff' : C.muted }}>
+                                        {f.key === 'Pending_Assessment' ? 'In Assessment' : f.key}
+                                    </span>
                                     {cnt > 0 && (
                                         <div style={{ ...S.filterCount, ...(active ? S.filterCountActive : {}) }}>
                                             <span style={{ fontSize: 10, fontWeight: '700', color: active ? '#fff' : C.muted }}>{cnt}</span>
@@ -373,13 +376,13 @@ export default function MyApplicationsScreen() {
                         <div style={S.empty}>
                             <div style={S.emptyIcon}><IoDocumentTextOutline size={30} color={C.mutedLight} /></div>
                             <div style={S.emptyTitle}>
-                                {filter === 'All' ? 'No applications yet' : `No ${filter.toLowerCase()} applications`}
+                                {filter === 'All' ? 'No applications yet' : `No ${filter === 'Pending_Assessment' ? 'in-assessment' : filter.toLowerCase()} applications`}
                             </div>
                             <div style={S.emptySub}>
-                                {filter === 'All' ? 'Browse available devices to get started' : `You have no ${filter.toLowerCase()} applications`}
+                                {filter === 'All' ? 'Submit your indigent registration application to get started' : `You have no applications in this category`}
                             </div>
                             {filter === 'All' && (
-                                <button style={S.emptyBtn} onClick={() => navigate('/device-catalog')}>Browse Devices</button>
+                                <button style={S.emptyBtn} onClick={handleNewApplicationClick}>Submit Application</button>
                             )}
                         </div>
                     ) : (
@@ -424,9 +427,6 @@ const S = {
     appTop:    { display: 'flex', alignItems: 'flex-start', marginBottom: 10 },
     appDevice: { fontSize: 15, fontWeight: '800', color: C.text, marginBottom: 3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
     appModel:  { fontSize: 12, color: C.muted },
-    pillRow:   { display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 10 },
-    pill:      { display: 'flex', alignItems: 'center', gap: 4, backgroundColor: C.bg, padding: '4px 8px', borderRadius: 8, border: `1px solid ${C.border}` },
-    pillText:  { fontSize: 11, color: C.muted, fontWeight: '500' },
 
     appFooter:      { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
     appDate:        { fontSize: 11, color: C.mutedLight },

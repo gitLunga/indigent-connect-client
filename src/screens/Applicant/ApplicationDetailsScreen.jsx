@@ -1,14 +1,12 @@
-// screens/Client/ApplicationDetailsScreen.jsx
-// Updated:
-//  - Device section: full info (name, model, manufacturer, plan, contract, total cost, plan details)
-//  - Applicant section: Full Name + Email from application data, with fallback to localStorage user
-//  - Timeline: Submission date shown, Under Review shows current status badge, final step reflects outcome
+// screens/Applicant/ApplicationDetailsScreen.jsx
+//  - Applicant section: Full Name + Email + ID/Region from application data, with fallback to localStorage user
+//  - Timeline: Submission date shown, Intake/Assessment review stages, final step reflects outcome
 //  - Cancel now uses ConfirmDialog instead of window.confirm
 //  - paddingVertical replaced with paddingTop/paddingBottom for web compatibility
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { deviceAPI } from '../../services/api';
+import { applicationAPI } from '../../services/api';
 import { useToast } from '../../components/ToastProvider';
 import ConfirmDialog from '../../components/ConfirmDialog';
 import { Sk, SkeletonShimmerStyle } from '../../components/SkeletonLoader';
@@ -22,11 +20,9 @@ import {
     IoMailOutline,
     IoCalendarOutline,
     IoAlertCircleOutline,
-    IoPhonePortraitOutline,
-    IoCashOutline,
-    IoDocumentTextOutline,
-    IoBriefcaseOutline,
-    IoInformationCircleOutline,
+    IoCardOutline,
+    IoLocationOutline,
+    IoCallOutline,
     IoRefreshOutline,
 } from 'react-icons/io5';
 
@@ -52,11 +48,11 @@ const C = {
 };
 
 const STATUS_META = {
-    Approved:         { bg: C.greenSoft, fg: C.green, dot: C.green,  icon: IoCheckmarkCircle, label: 'Approved',          timelineLabel: 'Approved' },
-    Pending:          { bg: C.amberSoft, fg: C.amber, dot: C.amber,  icon: IoTime,            label: 'Under Review',      timelineLabel: 'Under Review' },
-    Pending_Finance:  { bg: '#EDE9FE',   fg: '#7C3AED', dot: '#7C3AED', icon: IoTime,         label: 'Finance Review',    timelineLabel: 'Awaiting Finance' },
-    Rejected:         { bg: C.roseSoft,  fg: C.rose,  dot: C.rose,   icon: IoCloseCircle,     label: 'Rejected',          timelineLabel: 'Rejected' },
-    Cancelled:        { bg: C.slateSoft, fg: C.slate, dot: C.slate,  icon: IoCloseCircle,     label: 'Cancelled',         timelineLabel: 'Cancelled' },
+    Approved:           { bg: C.greenSoft, fg: C.green, dot: C.green,  icon: IoCheckmarkCircle, label: 'Approved',        timelineLabel: 'Approved' },
+    Pending:            { bg: C.amberSoft, fg: C.amber, dot: C.amber,  icon: IoTime,            label: 'Under Review',   timelineLabel: 'Under Review' },
+    Pending_Assessment: { bg: '#EDE9FE',   fg: '#7C3AED', dot: '#7C3AED', icon: IoTime,          label: 'In Assessment',  timelineLabel: 'Awaiting Assessment' },
+    Rejected:           { bg: C.roseSoft,  fg: C.rose,  dot: C.rose,   icon: IoCloseCircle,     label: 'Rejected',       timelineLabel: 'Rejected' },
+    Cancelled:          { bg: C.slateSoft, fg: C.slate, dot: C.slate,  icon: IoCloseCircle,     label: 'Cancelled',      timelineLabel: 'Cancelled' },
 };
 
 // ─── Reusable info row ──────────────────────────────────────────────────────
@@ -94,7 +90,7 @@ export default function ApplicationDetailsScreen() {
             if (!userStr) { navigate('/login'); return; }
             const u = JSON.parse(userStr);
             setUser(u);
-            const res = await deviceAPI.getApplicationDetails(u.client_user_id, parseInt(applicationId));
+            const res = await applicationAPI.getApplicationDetails(u.applicant_id, parseInt(applicationId));
 
             // Robustly unwrap — try every nesting shape the API might return
             const d = res?.data;
@@ -110,16 +106,9 @@ export default function ApplicationDetailsScreen() {
 
             // Normalise alternate field name variants
             if (raw && typeof raw === 'object') {
-                raw.submission_date  = raw.submission_date  || raw.created_at         || raw.submitted_at || raw.date_submitted || null;
-                raw.last_updated     = raw.last_updated     || raw.updated_at         || raw.last_modified || raw.date_updated  || null;
-                raw.device_name      = raw.device_name      || raw.name               || raw.device       || null;
-                raw.manufacturer     = raw.manufacturer     || raw.device_manufacturer || raw.brand       || null;
-                raw.model            = raw.model            || raw.device_model        || null;
-                raw.plan_name        = raw.plan_name        || raw.contract_plan       || raw.plan         || null;
-                raw.plan_details     = raw.plan_details     || raw.plan_description    || raw.details      || null;
-                raw.monthly_cost     = raw.monthly_cost     || raw.cost_per_month      || raw.price        || null;
-                raw.contract_duration_months = raw.contract_duration_months || raw.duration || raw.contract_duration || null;
-                raw.application_status       = raw.application_status       || raw.status   || 'Pending';
+                raw.submission_date  = raw.submission_date  || raw.created_at || raw.submitted_at || raw.date_submitted || null;
+                raw.last_updated     = raw.last_updated     || raw.updated_at || raw.last_modified || raw.date_updated  || null;
+                raw.application_status = raw.application_status || raw.status || 'Pending';
             }
 
             console.log('[ApplicationDetails] API raw:', raw);
@@ -133,10 +122,10 @@ export default function ApplicationDetailsScreen() {
     };
 
     const handleCancelClick = () => {
-        if (!user?.client_user_id || !application) return;
+        if (!user?.applicant_id || !application) return;
         setDialog({
             title: 'Cancel Application',
-            message: `Cancel your application for the ${application.device_name}?`,
+            message: `Cancel application #${application.application_id}?`,
             details: 'This action cannot be undone. Your application will be permanently cancelled.',
             confirmText: 'Yes, Cancel It',
             cancelText: 'Keep Application',
@@ -147,7 +136,7 @@ export default function ApplicationDetailsScreen() {
 
     const doCancel = () => {
         setCancelling(true);
-        deviceAPI.cancelApplication(user.client_user_id, application.application_id)
+        applicationAPI.cancelApplication(user.applicant_id, application.application_id)
             .then(res => {
                 if (res.data.success) {
                     toast.success('Cancelled', res.data.message || 'Your application has been cancelled.');
@@ -166,24 +155,24 @@ export default function ApplicationDetailsScreen() {
     };
 
     const handleReapplyClick = () => {
-        if (!user?.client_user_id || !application) return;
+        if (!user?.applicant_id || !application) return;
         setDialog({
-            title: 'Re-apply for Device',
-            message: `Re-apply for the ${application.device_name}?`,
-            details: 'A new application will be created and submitted for review.',
-            confirmText: 'Yes, Re-apply',
+            title: 'Resubmit Application',
+            message: `Resubmit application #${application.application_id}?`,
+            details: 'A new application will be created and submitted for intake review.',
+            confirmText: 'Yes, Resubmit',
             cancelText: 'Not Now',
-            variant: 'primary',
+            variant: 'default',
             onConfirm: doReapply,
         });
     };
 
     const doReapply = () => {
         setReapplying(true);
-        deviceAPI.resubmitApplication(user.client_user_id, application.application_id)
+        applicationAPI.resubmitApplication(user.applicant_id, application.application_id)
             .then(res => {
                 if (res.data.success) {
-                    toast.success('Re-applied!', res.data.message || 'New application submitted for review.');
+                    toast.success('Resubmitted!', res.data.message || 'New application submitted for review.');
                     setTimeout(() => navigate('/my-applications'), 1200);
                 } else {
                     toast.error('Failed', res.data.message);
@@ -232,18 +221,10 @@ export default function ApplicationDetailsScreen() {
                         <Sk w={140} h={22} r={10} />
                         <Sk w={100} h={13} r={6} />
                     </div>
-                    {/* Device card */}
+                    {/* Applicant card */}
                     <div style={{ backgroundColor: C.surface, borderRadius: 16, border: `1px solid ${C.border}`, padding: '0 16px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 14, paddingTop: 16, paddingBottom: 16, borderBottom: `1px solid ${C.border}` }}>
-                            <Sk w={48} h={48} r={13} />
-                            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 7 }}>
-                                <Sk w="60%" h={17} r={8} />
-                                <Sk w="40%" h={12} r={6} />
-                            </div>
-                            <Sk w={60} h={52} r={11} />
-                        </div>
-                        {[...Array(6)].map((_, i) => (
-                            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, paddingTop: 13, paddingBottom: 13, borderBottom: i < 5 ? `1px solid ${C.border}` : 'none' }}>
+                        {[...Array(4)].map((_, i) => (
+                            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, paddingTop: 13, paddingBottom: 13, borderBottom: i < 3 ? `1px solid ${C.border}` : 'none' }}>
                                 <Sk w={32} h={32} r={9} />
                                 <Sk w={120} h={13} r={6} />
                                 <Sk w="35%" h={13} r={6} style={{ marginLeft: 'auto' }} />
@@ -297,39 +278,37 @@ export default function ApplicationDetailsScreen() {
             ? `${user.first_name} ${user.last_name}`
             : '—';
     const applicantEmail = application.email || user?.email || '—';
-
-    // Contract total cost
-    const contractTotal = application.monthly_cost && application.contract_duration_months
-        ? `R${(Number(application.monthly_cost) * Number(application.contract_duration_months)).toLocaleString('en-ZA')}`
-        : '—';
+    const applicantIdNumber = application.id_number || user?.id_number || '—';
+    const applicantRegion   = application.region || user?.region || '—';
+    const applicantPhone    = application.phone_number || user?.phone_number || '—';
 
     // Build 4-step timeline
     const currentStepIdx = {
-        Pending:         1,
-        Pending_Finance: 2,
-        Approved:        3,
-        Rejected:        3,
-        Cancelled:       3,
+        Pending:            1,
+        Pending_Assessment: 2,
+        Approved:           3,
+        Rejected:           3,
+        Cancelled:          3,
     }[application.application_status] ?? 1;
-    const isActive = ['Pending', 'Pending_Finance'].includes(application.application_status);
+    const isActive = ['Pending', 'Pending_Assessment'].includes(application.application_status);
 
     const timelineSteps = [
         {
             key: 'submitted',
             label: 'Application Submitted',
-            sublabel: `Application #${application.application_id ?? applicationId} received by DoJ&CD`,
+            sublabel: `Application #${application.application_id ?? applicationId} received for review`,
             date: application.submission_date,
             state: 'done',
             color: C.green,
             showBadge: false,
         },
         {
-            key: 'review',
-            label: 'Initial Review',
+            key: 'intake',
+            label: 'Intake Review',
             sublabel: currentStepIdx === 1
-                ? 'Your application is being reviewed by the DoJ&CD team'
+                ? 'Your application is being reviewed by an Intake Clerk'
                 : currentStepIdx > 1
-                    ? 'Completed — forwarded for finance assessment'
+                    ? 'Completed — forwarded for means-test assessment'
                     : 'Awaiting review',
             date: currentStepIdx >= 1 ? application.last_updated : null,
             state: currentStepIdx > 1 ? 'done' : (currentStepIdx === 1 && isActive ? 'active' : 'upcoming'),
@@ -337,13 +316,13 @@ export default function ApplicationDetailsScreen() {
             showBadge: currentStepIdx === 1 && isActive,
         },
         {
-            key: 'finance',
-            label: 'Finance Review',
+            key: 'assessment',
+            label: 'Assessment Review',
             sublabel: currentStepIdx === 2
-                ? 'Being assessed by the Finance department'
+                ? 'Being assessed by an Assessment Officer (means test)'
                 : currentStepIdx > 2
-                    ? 'Finance approval granted'
-                    : 'Awaiting Finance review',
+                    ? 'Assessment completed'
+                    : 'Awaiting assessment review',
             date: currentStepIdx >= 2 ? application.last_updated : null,
             state: currentStepIdx > 2 ? 'done' : (currentStepIdx === 2 && isActive ? 'active' : 'upcoming'),
             color: C.green,
@@ -356,12 +335,12 @@ export default function ApplicationDetailsScreen() {
                  : application.application_status === 'Cancelled' ? 'Cancelled'
                  : 'Final Decision',
             sublabel: application.application_status === 'Approved'
-                ? 'Your device application has been approved — device will be issued'
+                ? 'Your indigent registration has been approved — you will be enrolled for subsidized services'
                 : application.application_status === 'Rejected'
                     ? (application.rejection_reason || 'Application was not approved at this time')
                     : application.application_status === 'Cancelled'
                         ? 'This application was cancelled'
-                        : 'Awaiting final decision from management',
+                        : 'Awaiting final decision',
             date: currentStepIdx >= 3 ? application.last_updated : null,
             state: currentStepIdx >= 3 ? 'done' : 'upcoming',
             color: application.application_status === 'Approved' ? C.green
@@ -431,63 +410,31 @@ export default function ApplicationDetailsScreen() {
                                 ) : (
                                     <>
                                         <IoRefreshOutline size={17} color={C.accent} />
-                                        <span style={S.reapplyBtnText}>Re-apply for this Device</span>
+                                        <span style={S.reapplyBtnText}>Resubmit Application</span>
                                     </>
                                 )}
                             </button>
                         )}
                     </div>
 
-                    {/* ── DEVICE ── */}
-                    <div className="ad-section" style={{ animationDelay: '50ms' }}>
-                        <div style={S.sectionLabel}>
-                            <IoPhonePortraitOutline size={14} color={C.accent} />
-                            DEVICE DETAILS
-                        </div>
-                        <div style={S.card}>
-                            {/* Device name + price */}
-                            <div style={S.deviceTop}>
-                                <div style={S.deviceIco}>
-                                    <IoPhonePortraitOutline size={24} color={C.accent} />
-                                </div>
-                                <div style={{ flex: 1, minWidth: 0 }}>
-                                    <div style={S.deviceName}>{application.device_name}</div>
-                                    <div style={S.deviceSub}>{[application.model, application.manufacturer].filter(Boolean).join(' · ') || '—'}</div>
-                                </div>
-                                <div style={S.pricePill}>
-                                    <div style={S.priceVal}>{application.monthly_cost ? `R${Number(application.monthly_cost).toLocaleString('en-ZA')}` : '—'}</div>
-                                    <div style={S.priceUnit}>/mo</div>
-                                </div>
-                            </div>
-
-                            {/* All device info rows */}
-                            <InfoRow icon={IoPhonePortraitOutline} label="Device Name"       value={application.device_name} />
-                            <InfoRow icon={IoBriefcaseOutline}    label="Manufacturer"      value={application.manufacturer} />
-                            <InfoRow icon={IoInformationCircleOutline} label="Model"         value={application.model} />
-                            <InfoRow icon={IoDocumentTextOutline} label="Plan Name"          value={application.plan_name} />
-                            <InfoRow icon={IoInformationCircleOutline} label="Plan Details"  value={application.plan_details} />
-                            <InfoRow icon={IoCashOutline}          label="Monthly Cost"      value={application.monthly_cost ? `R${Number(application.monthly_cost).toLocaleString('en-ZA')}` : '—'} valueColor={C.green} />
-                            <InfoRow icon={IoCalendarOutline}      label="Contract Duration" value={application.contract_duration_months ? `${application.contract_duration_months} Months` : '—'} />
-                            <InfoRow icon={IoCashOutline}          label="Contract Total"    value={contractTotal} valueColor={C.navy} last />
-                        </div>
-                    </div>
-
                     {/* ── APPLICANT ── */}
-                    <div className="ad-section" style={{ animationDelay: '100ms' }}>
+                    <div className="ad-section" style={{ animationDelay: '50ms' }}>
                         <div style={S.sectionLabel}>
                             <IoPersonOutline size={14} color={C.accent} />
                             APPLICANT INFORMATION
                         </div>
                         <div style={S.card}>
-                            {/* Info rows */}
-                            <InfoRow icon={IoPersonOutline}   label="Full Name"   value={applicantName} />
-                            <InfoRow icon={IoMailOutline}     label="Email"       value={applicantEmail} />
+                            <InfoRow icon={IoPersonOutline}    label="Full Name"   value={applicantName} />
+                            <InfoRow icon={IoMailOutline}      label="Email"       value={applicantEmail} />
+                            <InfoRow icon={IoCallOutline}      label="Phone"       value={applicantPhone} />
+                            <InfoRow icon={IoCardOutline}      label="ID Number"   value={applicantIdNumber} />
+                            <InfoRow icon={IoLocationOutline}  label="Region"      value={applicantRegion} last />
                         </div>
                     </div>
 
                     {/* ── REJECTION REASON ── */}
                     {application.rejection_reason && (
-                        <div className="ad-section" style={{ animationDelay: '120ms' }}>
+                        <div className="ad-section" style={{ animationDelay: '100ms' }}>
                             <div style={S.sectionLabel}>
                                 <IoAlertCircleOutline size={14} color={C.rose} />
                                 REJECTION REASON
@@ -633,34 +580,4 @@ const S = {
         borderRadius: 16, padding: '0 16px',
         border: `1px solid ${C.border}`,
     },
-
-    // Device card top
-    deviceTop: {
-        display: 'flex', alignItems: 'center', gap: 14,
-        paddingTop: 16, paddingBottom: 16,
-        borderBottom: `1px solid ${C.border}`,
-        marginBottom: 0,
-    },
-    deviceIco:  { width: 48, height: 48, borderRadius: 13, backgroundColor: C.accentSoft, display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 },
-    deviceName: { fontSize: 17, fontWeight: '800', color: C.text, marginBottom: 3 },
-    deviceSub:  { fontSize: 12, color: C.muted },
-    pricePill:  { backgroundColor: C.greenSoft, padding: '7px 12px', borderRadius: 11, display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 },
-    priceVal:   { fontSize: 17, fontWeight: '800', color: C.green },
-    priceUnit:  { fontSize: 10, color: C.green, fontWeight: '600' },
-
-    // Applicant card top
-    applicantTop: {
-        display: 'flex', alignItems: 'center', gap: 14,
-        paddingTop: 16, paddingBottom: 16,
-        borderBottom: `1px solid ${C.border}`,
-    },
-    applicantAvatar: {
-        width: 48, height: 48, borderRadius: 13,
-        backgroundColor: C.accent,
-        display: 'flex', justifyContent: 'center', alignItems: 'center',
-        flexShrink: 0,
-    },
-    applicantAvatarText: { fontSize: 20, fontWeight: '900', color: '#fff' },
-    applicantName:  { fontSize: 16, fontWeight: '800', color: C.text, marginBottom: 3 },
-    applicantEmail: { fontSize: 12, color: C.muted },
 };

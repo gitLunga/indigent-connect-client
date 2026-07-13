@@ -10,7 +10,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import ConfirmDialog from './ConfirmDialog';
 import {
     IoGridOutline,
-    IoPhonePortraitOutline,
+    IoHomeOutline,
     IoDocumentTextOutline,
     IoPersonOutline,
     IoNotificationsOutline,
@@ -20,7 +20,6 @@ import {
     IoChevronForward,
     IoTimeOutline,
 } from 'react-icons/io5';
-import dojLogo from '../assets/images/Department-of-Justice-logo.jpg';
 
 // ─── Design tokens ────────────────────────────────────────────────────────
 export const C = {
@@ -49,8 +48,7 @@ export const C = {
 };
 
 const NAV_ITEMS = [
-    { key: 'dashboard',     label: 'Dashboard',     path: '/client-dashboard', icon: IoGridOutline },
-    { key: 'devices',       label: 'Devices',        path: '/device-catalog',   icon: IoPhonePortraitOutline },
+    { key: 'dashboard',     label: 'Dashboard',     path: '/applicant-dashboard', icon: IoGridOutline },
     { key: 'applications',  label: 'Applications',   path: '/my-applications',  icon: IoDocumentTextOutline },
     { key: 'notifications', label: 'Notifications',  path: '/notifications',    icon: IoNotificationsOutline, isBell: true },
     { key: 'profile',       label: 'Profile',        path: '/complete-profile', icon: IoPersonOutline },
@@ -101,7 +99,7 @@ export default function SidebarLayout({ children, unreadCount = 0, user }) {
     // ── Session expiry detection ──────────────────────────────────────────
     useEffect(() => {
         try {
-            const token = localStorage.getItem('clientToken');
+            const token = localStorage.getItem('applicantToken');
             if (!token) return;
             const payload = JSON.parse(atob(token.split('.')[1]));
             if (!payload?.exp) return;
@@ -147,8 +145,8 @@ export default function SidebarLayout({ children, unreadCount = 0, user }) {
 
     const doLogout = () => {
         localStorage.removeItem('user');
-        localStorage.removeItem('clientToken');
-        localStorage.removeItem('clientRefreshToken');
+        localStorage.removeItem('applicantToken');
+        localStorage.removeItem('applicantRefreshToken');
         localStorage.removeItem('profile_skipped');
         navigate('/login');
     };
@@ -198,12 +196,12 @@ export default function SidebarLayout({ children, unreadCount = 0, user }) {
             {/* Brand */}
             <div style={sb.brand}>
                 <div style={sb.brandIcon}>
-                    <img src={dojLogo} alt="DoJ&CD" style={{ width: collapsed ? 22 : 28, height: collapsed ? 22 : 28, objectFit: 'contain', display: 'block' }} />
+                    <IoHomeOutline size={collapsed ? 20 : 24} color={C.accent} />
                 </div>
                 {!collapsed && (
                     <div>
-                        <div style={sb.brandTitle}>DOJCD</div>
-                        <div style={sb.brandSub}>Connect Portal</div>
+                        <div style={sb.brandTitle}>IndigentConnect</div>
+                        <div style={sb.brandSub}>Applicant Portal</div>
                     </div>
                 )}
             </div>
@@ -219,7 +217,7 @@ export default function SidebarLayout({ children, unreadCount = 0, user }) {
                         <div style={sb.userName} title={`${user.first_name} ${user.last_name}`}>
                             {user.first_name} {user.last_name}
                         </div>
-                        <div style={sb.userRole}>{user.registration_status || 'Client'}</div>
+                        <div style={sb.userRole}>{user.registration_status || 'Applicant'}</div>
                     </div>
                 </div>
             )}
@@ -323,7 +321,7 @@ export default function SidebarLayout({ children, unreadCount = 0, user }) {
                 <ConfirmDialog
                     config={logoutDialog ? {
                         title: 'Sign Out',
-                        message: 'Are you sure you want to sign out of DOJCD Connect?',
+                        message: 'Are you sure you want to sign out of IndigentConnect?',
                         confirmText: 'Yes, Sign Out',
                         cancelText: 'Stay',
                         variant: 'logout',
@@ -377,7 +375,7 @@ export default function SidebarLayout({ children, unreadCount = 0, user }) {
                 <ConfirmDialog
                     config={logoutDialog ? {
                         title: 'Sign Out',
-                        message: 'Are you sure you want to sign out of DOJCD Connect?',
+                        message: 'Are you sure you want to sign out of IndigentConnect?',
                         confirmText: 'Yes, Sign Out',
                         cancelText: 'Stay',
                         variant: 'logout',
@@ -400,8 +398,8 @@ export default function SidebarLayout({ children, unreadCount = 0, user }) {
                         <IoMenuOutline size={24} color={C.white} />
                     </button>
                     <div style={sb.mobileBrand}>
-                        <img src={dojLogo} alt="DoJ&CD" style={{ width: 22, height: 22, objectFit: 'contain', display: 'block', marginRight: 8, flexShrink: 0 }} />
-                        <span style={sb.mobileBrandText}>DOJCD Connect</span>
+                        <IoHomeOutline size={20} color="#fff" style={{ marginRight: 8, flexShrink: 0 }} />
+                        <span style={sb.mobileBrandText}>IndigentConnect</span>
                     </div>
                     <button style={sb.mobileIconBtn} onClick={() => navigate('/notifications')}>
                         <IoNotificationsOutline size={22} color={C.white} />
@@ -442,7 +440,7 @@ export default function SidebarLayout({ children, unreadCount = 0, user }) {
             <ConfirmDialog
                 config={logoutDialog ? {
                     title: 'Sign Out',
-                    message: 'Are you sure you want to sign out of DOJCD Connect?',
+                    message: 'Are you sure you want to sign out of IndigentConnect?',
                     confirmText: 'Yes, Sign Out',
                     cancelText: 'Stay',
                     variant: 'logout',

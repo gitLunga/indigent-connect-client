@@ -1,6 +1,5 @@
-// screens/Auth/ClientRegisterScreen.jsx
-// Updated: PublicFooter added at the bottom of the page.
-// All original multi-step form logic, validation, and API calls preserved exactly.
+// screens/Auth/ApplicantRegisterScreen.jsx
+// Multi-step applicant registration form: Personal Info → Region & ID → Password → Terms.
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -21,13 +20,12 @@ import {
     IoLocationOutline,
     IoCardOutline,
     IoBusinessOutline,
-    IoBriefcaseOutline,
     IoDocumentTextOutline,
     IoArrowBack,
     IoArrowForward,
     IoCheckmarkCircleOutline,
+    IoHomeOutline,
 } from 'react-icons/io5';
-import dojLogo from '../../assets/images/Department-of-Justice-logo.jpg';
 
 const C = {
     navy:       '#0F1F3D',
@@ -61,19 +59,6 @@ const SOUTH_AFRICAN_REGIONS = [
     'Eastern Cape', 'Free State', 'Gauteng', 'KwaZulu-Natal',
     'Limpopo', 'Mpumalanga', 'Northern Cape', 'North West', 'Western Cape',
 ].map(v => ({ value: v, label: v }));
-
-const DEPARTMENTS = [
-    { value: 'DoJ&CD Commission', label: 'DoJ&CD Commission' },
-    { value: 'DoJ&CD Gauteng',    label: 'DoJ&CD Gauteng' },
-    { value: 'DoJ&CD Eastern Cape', label: 'DoJ&CD Eastern Cape' },
-    { value: 'DoJ&CD KwaZulu Natal', label: 'DoJ&CD KwaZulu-Natal' },
-    { value: 'DoJ&CD Mpumalanga', label: 'DoJ&CD Mpumalanga' },
-    { value: 'DoJ&CD Northern Cape', label: 'DoJ&CD Northern Cape' },
-    { value: 'DoJ&CD Western Cape', label: 'DoJ&CD Western Cape' },
-    { value: 'DoJ&CD Limpopo',    label: 'DoJ&CD Limpopo' },
-    { value: 'DoJ&CD North West',  label: 'DoJ&CD North West' },
-    { value: 'DoJ&CD Free State', label: 'DoJ&CD Free State' },
-];
 
 const COUNTRY_CODE = '+27';
 
@@ -158,8 +143,7 @@ const SelectField = ({ label, value, placeholder, onSelect, editable, options, e
         return () => document.removeEventListener('mousedown', h);
     }, []);
     const IconComp = icon === 'person-circle-outline' ? IoPersonOutline
-        : icon === 'location-outline'      ? IoLocationOutline
-            : icon === 'briefcase-outline'     ? IoBriefcaseOutline : null;
+        : icon === 'location-outline'      ? IoLocationOutline : null;
     return (
         <div ref={ref} style={{ ...fieldStyles.wrap, position: 'relative' }}>
             <div style={fieldStyles.label}>{label.toUpperCase()}</div>
@@ -209,7 +193,7 @@ const StepBar = ({ current, total }) => (
 );
 
 // ─── Main component ──────────────────────────────────────────────────────────
-export default function ClientRegisterScreen() {
+export default function ApplicantRegisterScreen() {
     const toast    = useToast();
     const navigate = useNavigate();
 
@@ -217,8 +201,7 @@ export default function ClientRegisterScreen() {
     const [currentStep, setCurrentStep] = useState(1);
     const [formData, setFormData] = useState({
         title: '', firstName: '', lastName: '', email: '',
-        phoneNumber: '', region: '', persalId: '', departmentId: '',
-        userType: 'Advocate',
+        phoneNumber: '', region: '', idNumber: '', departmentId: '',
         password: '', confirmPassword: '',
     });
     const [errors,              setErrors]              = useState({});
@@ -243,9 +226,8 @@ export default function ClientRegisterScreen() {
                 break;
             case 2:
                 if (!formData.region)       { newErrors.region = 'Region is required'; isValid = false; }
-                if (!formData.persalId)     { newErrors.persalId = 'Personal ID is required'; isValid = false; }
-                else { const idErr = validateSouthAfricanID(formData.persalId); if (idErr) { newErrors.persalId = idErr; isValid = false; } }
-                if (!formData.departmentId) { newErrors.departmentId = 'Department ID is required'; isValid = false; }
+                if (!formData.idNumber)     { newErrors.idNumber = 'ID number is required'; isValid = false; }
+                else { const idErr = validateSouthAfricanID(formData.idNumber); if (idErr) { newErrors.idNumber = idErr; isValid = false; } }
                 break;
             case 3:
                 if (!formData.password)        { newErrors.password = 'Password is required'; isValid = false; }
@@ -289,15 +271,14 @@ export default function ClientRegisterScreen() {
                 email:         formData.email,
                 phone_number:  formData.phoneNumber,
                 region:        formData.region,
-                persal_id:     formData.persalId,
-                department_id: formData.departmentId,
-                user_type:     formData.userType,
+                id_number:     formData.idNumber,
+                department_id: formData.departmentId || null,
                 password:      formData.password,
             };
-            const response = await authAPI.registerClient(registrationData);
+            const response = await authAPI.registerApplicant(registrationData);
             localStorage.setItem('user', JSON.stringify(response.user));
             toast.success('Registration Submitted!', response.message || 'Your account is pending verification.');
-            setFormData({ title: '', firstName: '', lastName: '', email: '', phoneNumber: '', region: '', persalId: '', departmentId: '', userType: 'Advocate', password: '', confirmPassword: '' });
+            setFormData({ title: '', firstName: '', lastName: '', email: '', phoneNumber: '', region: '', idNumber: '', departmentId: '', password: '', confirmPassword: '' });
             setErrors({});
             setCurrentStep(1);
             setTimeout(() => navigate('/login'), 1800);
@@ -324,7 +305,7 @@ export default function ClientRegisterScreen() {
                     <SelectField label="Title" value={formData.title} placeholder="Select your title" onSelect={v => { setFormData({ ...formData, title: v }); setErrors(p => ({ ...p, title: '' })); }} editable={!loading} options={TITLES} error={errors.title} icon="person-circle-outline" />
                     <Field label="First Name *" placeholder="Enter your first name" value={formData.firstName} editable={!loading} onChangeText={t => setFormData({ ...formData, firstName: t })} onBlur={() => setErrors(p => ({ ...p, firstName: !formData.firstName ? 'First name is required' : '' }))} error={errors.firstName} icon="text-outline" autoComplete="given-name" name="firstName" />
                     <Field label="Last Name *" placeholder="Enter your last name" value={formData.lastName} editable={!loading} onChangeText={t => setFormData({ ...formData, lastName: t })} onBlur={() => setErrors(p => ({ ...p, lastName: !formData.lastName ? 'Last name is required' : '' }))} error={errors.lastName} icon="text-outline" autoComplete="family-name" name="lastName" />
-                    <Field label="Email Address *" placeholder="your.email@dojcd.gov.za" type="email" value={formData.email} editable={!loading} onChangeText={t => setFormData({ ...formData, email: t })} onBlur={() => { if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) setErrors(p => ({ ...p, email: 'Please enter a valid email address' })); }} error={errors.email} icon="mail-outline" autoComplete="email" name="email" />
+                    <Field label="Email Address *" placeholder="your.email@example.com" type="email" value={formData.email} editable={!loading} onChangeText={t => setFormData({ ...formData, email: t })} onBlur={() => { if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) setErrors(p => ({ ...p, email: 'Please enter a valid email address' })); }} error={errors.email} icon="mail-outline" autoComplete="email" name="email" />
                     <Field label="Phone Number" placeholder="+27 XXX XXX XXX" type="tel" value={formData.phoneNumber} editable={!loading} onChangeText={handlePhoneNumberChange} error={errors.phoneNumber} icon="call-outline" hint="South African number — 9 digits after +27" autoComplete="tel" name="phone" />
                 </>
             );
@@ -332,23 +313,11 @@ export default function ClientRegisterScreen() {
                 <>
                     <div style={stepContentStyles.stepIntro}>
                         <div style={{ ...stepContentStyles.stepIco, backgroundColor: C.accentSoft }}><IoLocationOutline size={20} color={C.accent} /></div>
-                        <div><div style={stepContentStyles.stepTitle}>Department Details</div><div style={stepContentStyles.stepSub}>Your official credentials</div></div>
+                        <div><div style={stepContentStyles.stepTitle}>Region &amp; Identification</div><div style={stepContentStyles.stepSub}>Where you live and your ID number</div></div>
                     </div>
                     <SelectField label="Region / Province *" value={formData.region} placeholder="Select your region" onSelect={v => { setFormData({ ...formData, region: v }); setErrors(p => ({ ...p, region: '' })); }} editable={!loading} options={SOUTH_AFRICAN_REGIONS} error={errors.region} icon="location-outline" />
-                    <Field label="PERSAL / SA ID Number *" placeholder="Enter your 13-digit ID" value={formData.persalId} editable={!loading} onChangeText={t => setFormData({ ...formData, persalId: t })} onBlur={() => { if (formData.persalId) { const e = validateSouthAfricanID(formData.persalId); if (e) setErrors(p => ({ ...p, persalId: e })); } }} error={errors.persalId} icon="card-outline" hint="Your South African ID / PERSAL number (13 digits)" />
-                    <SelectField label="Department *" value={formData.departmentId} placeholder="Select your department" onSelect={v => { setFormData({ ...formData, departmentId: v }); setErrors(p => ({ ...p, departmentId: '' })); }} editable={!loading} options={DEPARTMENTS} error={errors.departmentId} icon="business-outline" />
-                    <div style={stepContentStyles.stepIntro}>
-                        <div style={{ ...stepContentStyles.stepIco, backgroundColor: C.accentSoft }}><IoBriefcaseOutline size={20} color={C.accent} /></div>
-                        <div><div style={stepContentStyles.stepTitle}>User Type</div><div style={stepContentStyles.stepSub}>Select your role in the department</div></div>
-                    </div>
-                    <div style={stepContentStyles.typeRow}>
-                        {['Advocate', 'Magistrate'].map(type => (
-                            <button key={type} type="button" disabled={loading} style={{ ...stepContentStyles.typeBtn, ...(formData.userType === type ? stepContentStyles.typeBtnActive : {}) }} onClick={() => setFormData({ ...formData, userType: type })}>
-                                <IoBriefcaseOutline size={16} color={formData.userType === type ? '#fff' : C.muted} />
-                                <span style={{ ...stepContentStyles.typeBtnText, ...(formData.userType === type ? stepContentStyles.typeBtnTextActive : {}) }}>{type}</span>
-                            </button>
-                        ))}
-                    </div>
+                    <Field label="South African ID Number *" placeholder="Enter your 13-digit ID" value={formData.idNumber} editable={!loading} onChangeText={t => setFormData({ ...formData, idNumber: t })} onBlur={() => { if (formData.idNumber) { const e = validateSouthAfricanID(formData.idNumber); if (e) setErrors(p => ({ ...p, idNumber: e })); } }} error={errors.idNumber} icon="card-outline" hint="Your 13-digit South African ID number" />
+                    <Field label="Municipal Ward / Office (optional)" placeholder="e.g. Ward 12" value={formData.departmentId} editable={!loading} onChangeText={t => setFormData({ ...formData, departmentId: t })} icon="business-outline" hint="Leave blank if you're not sure — this can be confirmed during assessment" />
                 </>
             );
             case 3: return (
@@ -386,11 +355,11 @@ export default function ClientRegisterScreen() {
                     <div style={stepContentStyles.termsBox}>
                         <div style={stepContentStyles.termsScroll}>
                             {[
-                                { title: '1. Authorized Use',      text: 'This platform is exclusively for DOJCD employees. Unauthorized use is prohibited and may result in disciplinary or legal action.' },
-                                { title: '2. Data Accuracy',       text: 'You are responsible for ensuring all information provided is accurate. False or misleading information may result in account termination.' },
-                                { title: '3. Device Responsibility',text: 'Approved devices remain government property. Users are responsible for their safekeeping and appropriate use.' },
+                                { title: '1. Eligibility',         text: 'This platform is for households applying for the municipal indigent subsidy. Applications are subject to a means-test assessment before approval.' },
+                                { title: '2. Data Accuracy',       text: 'You are responsible for ensuring all information and documents provided are accurate. False or misleading information may result in account termination or rejection of your application.' },
+                                { title: '3. Document Verification', text: 'Supporting documents (ID, proof of income, proof of residence) will be reviewed by municipal staff as part of the verification and assessment process.' },
                                 { title: '4. Confidentiality',     text: 'Do not share your login credentials. You are responsible for all activities conducted under your account.' },
-                                { title: '5. Compliance',          text: 'Use of this platform must comply with DOJCD policies, the Electronic Communications Act, and all applicable government regulations.' },
+                                { title: '5. Compliance',          text: 'Use of this platform must comply with the Protection of Personal Information Act (POPIA) and applicable municipal indigent policy regulations.' },
                             ].map((term, i) => (
                                 <div key={i} style={stepContentStyles.termItem}>
                                     <div style={stepContentStyles.termDot} />
@@ -418,10 +387,10 @@ export default function ClientRegisterScreen() {
                     <button style={headerStyles.backBtn} onClick={() => navigate(-1)}>
                         <IoArrowBack size={22} color="rgba(255,255,255,0.9)" />
                     </button>
-                    <div style={headerStyles.emblem}><img src={dojLogo} alt="DoJ&CD" style={{ width: 38, height: 38, objectFit: 'contain', display: 'block' }} /></div>
+                    <div style={headerStyles.emblem}><IoHomeOutline size={22} color={C.accent} /></div>
                     <div>
-                        <div style={headerStyles.title}>Client Registration</div>
-                        <div style={headerStyles.sub}>Create your account to request devices</div>
+                        <div style={headerStyles.title}>Applicant Registration</div>
+                        <div style={headerStyles.sub}>Create your account to apply for indigent services</div>
                     </div>
                 </div>
                 <StepBar current={currentStep} total={totalSteps} />
@@ -483,11 +452,6 @@ const stepContentStyles = {
     stepIco:      { width: 42, height: 42, borderRadius: 12, display: 'flex', justifyContent: 'center', alignItems: 'center' },
     stepTitle:    { fontSize: 18, fontWeight: '800', color: C.text, marginBottom: 2 },
     stepSub:      { fontSize: 12, color: C.muted },
-    typeRow:      { display: 'flex', gap: 10 },
-    typeBtn:      { flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 6, padding: '13px 0', borderRadius: 14, border: `1.5px solid ${C.border}`, backgroundColor: C.bg, cursor: 'pointer' },
-    typeBtnActive:{ backgroundColor: C.navy, borderColor: C.navy },
-    typeBtnText:  { fontSize: 15, fontWeight: '600', color: C.muted },
-    typeBtnTextActive: { color: '#fff' },
     reqCard:      { backgroundColor: C.bg, borderRadius: 14, padding: 16, border: `1px solid ${C.border}`, marginTop: 4, display: 'flex', flexDirection: 'column', gap: 10 },
     reqTitle:     { fontSize: 13, fontWeight: '700', color: C.text, marginBottom: 4 },
     reqRow:       { display: 'flex', alignItems: 'center', gap: 10 },

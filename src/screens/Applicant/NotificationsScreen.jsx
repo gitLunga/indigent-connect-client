@@ -1,4 +1,4 @@
-// screens/Client/NotificationsScreen.jsx
+// screens/Applicant/NotificationsScreen.jsx
 // Dedicated notifications page reached from /notifications.
 // - Lists all notifications
 // - Clicking an unread notification opens a popup showing full content, marks it read on close
@@ -60,7 +60,7 @@ function getNotifMeta(title = '') {
         return { color: '#059669', bg: '#D1FAE5', Icon: IoCheckmarkCircleOutline };
     if (t.includes('rejected') || t.includes('cancelled'))
         return { color: '#DC2626', bg: '#FEE2E2', Icon: IoAlertCircleOutline };
-    if (t.includes('finance') || t.includes('order') || t.includes('placed'))
+    if (t.includes('assessment') || t.includes('intake'))
         return { color: '#D97706', bg: '#FEF3C7', Icon: IoCheckmarkDoneOutline };
     if (t.includes('submitted') || t.includes('pending'))
         return { color: '#1E4FD8', bg: '#EBF0FF', Icon: IoInformationCircleOutline };
@@ -139,20 +139,20 @@ export default function NotificationsScreen() {
         if (!ud) { navigate('/login'); return; }
         const u = JSON.parse(ud);
         setUser(u);
-        await fetchNotifications(u.client_user_id);
+        await fetchNotifications(u.applicant_id);
         setLoading(false);
     };
 
     const fetchNotifications = async (id) => {
         try {
-            const r = await notificationAPI.getUserNotifications(id, 'Client');
+            const r = await notificationAPI.getUserNotifications(id, 'Applicant');
             if (r.data.success) setNotifications(r.data.data || []);
         } catch { toast.error('Error', 'Could not load notifications.'); }
     };
 
     const onRefresh = async () => {
         setRefreshing(true);
-        if (user) await fetchNotifications(user.client_user_id);
+        if (user) await fetchNotifications(user.applicant_id);
         setRefreshing(false);
     };
 
@@ -161,7 +161,7 @@ export default function NotificationsScreen() {
         setOpenNotif(notif);
         if (!notif.is_read && user) {
             try {
-                await notificationAPI.markAsRead(notif.notification_id, user.client_user_id, 'Client');
+                await notificationAPI.markAsRead(notif.notification_id, user.applicant_id, 'Applicant');
                 setNotifications(prev =>
                     prev.map(n => n.notification_id === notif.notification_id ? { ...n, is_read: true } : n)
                 );
@@ -172,7 +172,7 @@ export default function NotificationsScreen() {
     const handleMarkAllRead = async () => {
         if (!user) return;
         try {
-            const r = await notificationAPI.markAllAsRead(user.client_user_id, 'Client');
+            const r = await notificationAPI.markAllAsRead(user.applicant_id, 'Applicant');
             if (r.data.success) {
                 setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
                 toast.success('Done', 'All notifications marked as read.');
@@ -188,7 +188,7 @@ export default function NotificationsScreen() {
             variant: 'delete',
             onConfirm: async () => {
                 try {
-                    const r = await notificationAPI.deleteNotification(nid, user.client_user_id, 'Client');
+                    const r = await notificationAPI.deleteNotification(nid, user.applicant_id, 'Applicant');
                     if (r.data.success) {
                         setNotifications(prev => prev.filter(n => n.notification_id !== nid));
                         toast.success('Deleted', 'Notification removed.');

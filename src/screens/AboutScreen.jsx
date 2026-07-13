@@ -1,12 +1,12 @@
 // screens/AboutScreen.jsx
-// Describes the DOJCD Connect platform in detail.
+// Describes the IndigentConnect platform in detail.
 // Shares the AuthNavbar with Welcome/Login/Register screens.
 
 import React from 'react';
 import AuthNavbar from '../components/PublicNavbar';
 import PublicFooter from '../components/PublicFooter';
 import {
-    IoPhonePortraitOutline,
+    IoHomeOutline,
     IoCheckmarkCircleOutline,
     IoAnalyticsOutline,
     IoShieldCheckmarkOutline,
@@ -17,9 +17,8 @@ import {
     IoCloudUploadOutline,
     IoLockClosedOutline,
     IoNotificationsOutline,
-    IoGridOutline,
+    IoServerOutline,
 } from 'react-icons/io5';
-import dojLogo from '../assets/images/Department-of-Justice-logo.jpg';
 
 const C = {
     navy:       '#0F1F3D',
@@ -40,27 +39,27 @@ const C = {
 };
 
 const FEATURES = [
-    { icon: IoPhonePortraitOutline,   color: C.accent,  bg: C.accentSoft,  title: 'Device Procurement',    desc: 'Staff can browse an approved catalogue of mobile devices and submit formal requests directly through the platform, eliminating paperwork and manual processes.' },
-    { icon: IoCheckmarkCircleOutline, color: C.green,   bg: C.greenSoft,   title: 'Multi-level Approval',  desc: 'Applications flow through a structured approval workflow involving departmental supervisors and procurement officers, ensuring compliance at every step.' },
+    { icon: IoHomeOutline,            color: C.accent,  bg: C.accentSoft,  title: 'Indigent Registration', desc: 'Households can register an account and submit a formal subsidy application directly through the platform, eliminating paperwork and manual processes.' },
+    { icon: IoCheckmarkCircleOutline, color: C.green,   bg: C.greenSoft,   title: 'Means-Test Approval',   desc: 'Applications flow through a structured intake review and means-test assessment workflow, ensuring compliance at every step.' },
     { icon: IoAnalyticsOutline,       color: C.purple,  bg: C.purpleSoft,  title: 'Real-time Tracking',    desc: 'Applicants receive live status updates throughout the process — from submission to approval or rejection — with full visibility into where their application stands.' },
     { icon: IoShieldCheckmarkOutline, color: C.amber,   bg: C.amberSoft,   title: 'Secure & Compliant',    desc: 'Built on enterprise-grade security principles with role-based access control, encrypted data handling, and full audit trails to meet government compliance requirements.' },
-    { icon: IoCloudUploadOutline,     color: '#0891B2', bg: '#E0F7FA',     title: 'Document Management',   desc: 'Required supporting documentation can be uploaded directly to the platform, securely stored and linked to the application for review by approvers.' },
+    { icon: IoCloudUploadOutline,     color: '#0891B2', bg: '#E0F7FA',     title: 'Document Management',   desc: 'Required supporting documentation — ID, proof of income, proof of residence — can be uploaded directly to the platform for review by assessment officers.' },
     { icon: IoNotificationsOutline,   color: '#DC2626', bg: '#FEE2E2',     title: 'Instant Notifications', desc: 'Users receive automatic notifications when their application status changes, keeping them informed without needing to manually check the system.' },
 ];
 
 const PROCESS_STEPS = [
-    { num: '01', title: 'Register & Verify',     desc: 'Staff create an account using their PERSAL ID and departmental credentials. Accounts are verified by the system before access is granted.' },
-    { num: '02', title: 'Browse Catalogue',      desc: 'Verified users browse the approved device catalogue, which includes eligible smartphones and tablets with associated contract plans.' },
-    { num: '03', title: 'Submit Application',    desc: 'Users select a device and submit a formal application. Supporting documents are uploaded and the application enters the approval queue.' },
-    { num: '04', title: 'Approval Workflow',     desc: 'The application is reviewed by the relevant supervisors and procurement officers. Each approver adds their sign-off or raises queries.' },
-    { num: '05', title: 'Decision & Notification', desc: 'Once a final decision is made (approved or rejected), the applicant is notified immediately with a full explanation and next steps.' },
-    { num: '06', title: 'Device Provisioning',   desc: 'Approved applications are forwarded to the relevant supplier for device provisioning and delivery to the applicant\'s office.' },
+    { num: '01', title: 'Register & Verify',       desc: 'Applicants create an account using their South African ID number. Accounts are held for review before profile completion.' },
+    { num: '02', title: 'Complete Your Profile',   desc: 'Applicants upload supporting documents — ID, proof of income, and optionally proof of residence or an affidavit — for verification.' },
+    { num: '03', title: 'Account Verification',    desc: 'Municipal staff review the uploaded documents and verify the applicant\'s account before an application can be submitted.' },
+    { num: '04', title: 'Submit Application',      desc: 'Once verified, applicants submit a formal indigent registration application, which enters the review queue.' },
+    { num: '05', title: 'Intake & Assessment',     desc: 'The application is reviewed by an Intake Clerk for completeness, then assessed by an Assessment Officer through a means test.' },
+    { num: '06', title: 'Decision & Enrollment',   desc: 'Once a final decision is made (approved or rejected), the applicant is notified immediately. Approved applicants are enrolled for subsidized services.' },
 ];
 
 const WHO_USES = [
-    { icon: IoPeopleOutline,       color: C.accent,  bg: C.accentSoft, title: 'Magistrates',           desc: 'Court officials who require mobile devices for case management and judicial administration.' },
-    { icon: IoDocumentTextOutline, color: C.green,   bg: C.greenSoft,  title: 'Departmental Staff',    desc: 'DOJCD employees across all provinces who need devices for official departmental functions.' },
-    { icon: IoGridOutline,         color: C.purple,  bg: C.purpleSoft, title: 'Admin & Procurement',   desc: 'Internal administrative teams responsible for reviewing, approving, and managing device requests.' },
+    { icon: IoPeopleOutline,       color: C.accent,  bg: C.accentSoft, title: 'Indigent Households',   desc: 'Residents unable to afford municipal services who register and apply for subsidized rates.' },
+    { icon: IoDocumentTextOutline, color: C.green,   bg: C.greenSoft,  title: 'Intake & Assessment Officers', desc: 'Municipal staff who review application completeness and conduct the means-test assessment.' },
+    { icon: IoServerOutline,       color: C.purple,  bg: C.purpleSoft, title: 'Admin & Supervisors',   desc: 'Internal teams responsible for oversight, reporting, and managing the registration system.' },
 ];
 
 const STATS = [
@@ -86,12 +85,12 @@ export default function AboutScreen() {
                 <div style={S.heroContent}>
                     <div style={S.heroEmblemWrap}>
                         <div style={S.heroGlow} />
-                        <div style={S.heroEmblem}><img src={dojLogo} alt="Department of Justice & Constitutional Development" style={{ width: 80, height: 80, objectFit: 'contain', display: 'block' }} /></div>
+                        <div style={S.heroEmblem}><IoHomeOutline size={44} color={C.accent} /></div>
                     </div>
-                    <h1 style={S.heroTitle}>About DOJCD Connect</h1>
+                    <h1 style={S.heroTitle}>About IndigentConnect</h1>
                     <p style={S.heroSub}>
-                        The official device procurement platform of the<br />
-                        Department of Justice &amp; Constitutional Development
+                        The digital indigent registration platform for<br />
+                        South African municipalities
                     </p>
 
                     {/* Stats row */}
@@ -110,27 +109,27 @@ export default function AboutScreen() {
             <section style={S.section}>
                 <div style={S.sectionInner}>
                     <div style={S.badge}>OVERVIEW</div>
-                    <h2 style={S.sectionTitle}>What is DOJCD Connect?</h2>
+                    <h2 style={S.sectionTitle}>What is IndigentConnect?</h2>
                     <p style={S.bodyText}>
-                        DOJCD Connect is a centralised digital platform designed to modernise and streamline the mobile device
-                        procurement process for the Department of Justice and Constitutional Development (DOJCD) across all
-                        nine provinces of South Africa.
+                        IndigentConnect is a centralised digital platform designed to modernise and streamline the indigent
+                        registration process for South African municipalities, enabling households to apply for subsidized
+                        water, electricity, sanitation and refuse services.
                     </p>
                     <p style={S.bodyText}>
-                        Traditionally, device requests involved extensive paperwork, manual routing between departments, and
-                        significant delays in decision-making. DOJCD Connect replaces this process entirely with a secure,
-                        transparent, and efficient digital workflow — accessible from any web browser.
+                        Traditionally, indigent registration involved extensive paperwork, manual routing between departments,
+                        and significant delays in decision-making. IndigentConnect replaces this process entirely with a
+                        secure, transparent, and efficient digital workflow — accessible from any web browser.
                     </p>
                     <p style={S.bodyText}>
-                        From submission to approval, every step is tracked in real time. Applicants always know exactly where
-                        their request stands, while approvers have full visibility into pending items, documentation, and
-                        compliance requirements.
+                        From submission to decision, every step is tracked in real time. Applicants always know exactly where
+                        their application stands, while intake clerks and assessment officers have full visibility into
+                        pending items, documentation, and compliance requirements.
                     </p>
 
                     {/* Highlight cards */}
                     <div style={S.highlightGrid}>
                         {[
-                            { icon: IoTimeOutline,       color: C.amber,  bg: C.amberSoft,  text: 'Reduces procurement time from weeks to days' },
+                            { icon: IoTimeOutline,       color: C.amber,  bg: C.amberSoft,  text: 'Reduces registration time from weeks to days' },
                             { icon: IoDocumentTextOutline,color: C.accent, bg: C.accentSoft, text: 'Fully paperless — all documents are digital' },
                             { icon: IoLockClosedOutline,  color: C.green,  bg: C.greenSoft,  text: 'Secure role-based access for all user types' },
                             { icon: IoGlobeOutline,       color: C.purple, bg: C.purpleSoft, text: 'Accessible nationwide from any modern browser' },
@@ -151,7 +150,7 @@ export default function AboutScreen() {
                 <div style={S.sectionInner}>
                     <div style={S.badge}>FEATURES</div>
                     <h2 style={S.sectionTitle}>Platform Capabilities</h2>
-                    <p style={S.bodySub}>Everything you need to request, track, and manage device applications — in one place.</p>
+                    <p style={S.bodySub}>Everything you need to register, track, and manage your indigent application — in one place.</p>
                     <div style={S.featureGrid}>
                         {FEATURES.map((f, i) => (
                             <div key={i} style={S.featureCard}>
@@ -171,7 +170,7 @@ export default function AboutScreen() {
                 <div style={S.sectionInner}>
                     <div style={S.badge}>PROCESS</div>
                     <h2 style={S.sectionTitle}>How It Works</h2>
-                    <p style={S.bodySub}>A simple six-step process from registration to device delivery.</p>
+                    <p style={S.bodySub}>A simple six-step process from registration to service enrollment.</p>
                     <div style={S.processGrid}>
                         {PROCESS_STEPS.map((step, i) => (
                             <div key={i} style={S.processCard}>
@@ -188,8 +187,8 @@ export default function AboutScreen() {
             <section style={{ ...S.section, backgroundColor: C.bg }}>
                 <div style={S.sectionInner}>
                     <div style={S.badge}>USERS</div>
-                    <h2 style={S.sectionTitle}>Who Uses DOJCD Connect?</h2>
-                    <p style={S.bodySub}>The platform serves different roles within the Department of Justice ecosystem.</p>
+                    <h2 style={S.sectionTitle}>Who Uses IndigentConnect?</h2>
+                    <p style={S.bodySub}>The platform serves different roles within the municipal indigent registration process.</p>
                     <div style={S.whoGrid}>
                         {WHO_USES.map((w, i) => (
                             <div key={i} style={S.whoCard}>
@@ -210,17 +209,17 @@ export default function AboutScreen() {
                     <div style={S.badge}>COMPLIANCE</div>
                     <h2 style={S.sectionTitle}>Legal &amp; Regulatory Framework</h2>
                     <p style={S.bodyText}>
-                        DOJCD Connect operates in full compliance with South African government procurement regulations,
-                        including the Public Finance Management Act (PFMA), the Supply Chain Management Framework, and the
+                        IndigentConnect operates in accordance with South African municipal governance regulations,
+                        including the Municipal Systems Act, each municipality's Indigent Policy, and the
                         Protection of Personal Information Act (POPIA).
                     </p>
                     <p style={S.bodyText}>
-                        All user data is handled with strict confidentiality. Device usage is monitored to ensure approved
-                        devices are used exclusively for official departmental functions. Any misuse is subject to disciplinary
-                        procedures in accordance with the Public Service Act.
+                        All applicant data is handled with strict confidentiality. Means-test outcomes are reviewed
+                        against each municipality's indigent policy thresholds, and every decision is logged with a
+                        full audit trail for accountability and appeal purposes.
                     </p>
                     <div style={S.complianceGrid}>
-                        {['PFMA Compliant', 'POPIA Aligned', 'SCM Framework', 'Public Service Act', 'Audit Trail', 'Role-based Access'].map((tag, i) => (
+                        {['Municipal Systems Act', 'POPIA Aligned', 'Indigent Policy Framework', 'MFMA Aligned', 'Audit Trail', 'Role-based Access'].map((tag, i) => (
                             <div key={i} style={S.complianceTag}>{tag}</div>
                         ))}
                     </div>

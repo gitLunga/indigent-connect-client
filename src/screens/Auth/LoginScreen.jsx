@@ -16,8 +16,8 @@ import {
     IoCheckmark,
     IoArrowForward,
     IoPersonOutline,
+    IoHomeOutline,
 } from 'react-icons/io5';
-import dojLogo from '../../assets/images/Department-of-Justice-logo.jpg';
 
 const C = {
     navy:       '#0F1F3D',
@@ -68,12 +68,12 @@ export default function LoginScreen() {
             const refreshToken = body.data?.refreshToken;
             if (!user) throw new Error('No user data received from server');
             localStorage.setItem('user', JSON.stringify(user));
-            if (accessToken)  localStorage.setItem('clientToken', accessToken);
-            if (refreshToken) localStorage.setItem('clientRefreshToken', refreshToken);
+            if (accessToken)  localStorage.setItem('applicantToken', accessToken);
+            if (refreshToken) localStorage.setItem('applicantRefreshToken', refreshToken);
             if (formData.rememberMe) localStorage.setItem('rememberedEmail', formData.email);
             else localStorage.removeItem('rememberedEmail');
             toast.success('Welcome back!', body.message || 'Login successful');
-            setTimeout(() => navigate('/client-dashboard', { replace: true }), 900);
+            setTimeout(() => navigate('/applicant-dashboard', { replace: true }), 900);
         } catch (error) {
             const status = error.response?.status;
             const message = error.response?.data?.message;
@@ -101,10 +101,10 @@ export default function LoginScreen() {
                 <div style={S.bannerRing1} />
                 <div style={S.bannerRing2} />
                 <div style={S.bannerContent}>
-                    <div style={S.bannerEmblem}><img src={dojLogo} alt="DoJ&CD" style={{ width: 44, height: 44, objectFit: 'contain', display: 'block' }} /></div>
+                    <div style={S.bannerEmblem}><IoHomeOutline size={26} color={C.accent} /></div>
                     <div>
                         <h1 style={S.bannerTitle}>Welcome Back</h1>
-                        <p style={S.bannerSub}>Sign in to your DOJCD Connect account</p>
+                        <p style={S.bannerSub}>Sign in to your IndigentConnect account</p>
                     </div>
                     <div style={S.secureBadge}>
                         <div style={S.secureDot} />
@@ -131,7 +131,7 @@ export default function LoginScreen() {
                                 <input
                                     type="email" name="email" autoComplete="email"
                                     style={S.input}
-                                    placeholder="your.email@dojcd.gov.za"
+                                    placeholder="your.email@example.com"
                                     autoCapitalize="off" value={formData.email}
                                     onFocus={() => setFocused('email')} onBlur={() => setFocused(null)}
                                     onChange={e => { setFormData({ ...formData, email: e.target.value }); if (errors.email) setErrors({ ...errors, email: '' }); }}
@@ -197,11 +197,11 @@ export default function LoginScreen() {
                         </div>
 
                         {/* Register card */}
-                        <button type="button" style={S.regCard} onClick={() => navigate('/client-register')} disabled={loading}>
+                        <button type="button" style={S.regCard} onClick={() => navigate('/applicant-register')} disabled={loading}>
                             <div style={S.regIco}><IoPersonOutline size={22} color={C.accent} /></div>
                             <div style={{ flex: 1, textAlign: 'left' }}>
-                                <div style={S.regTitle}>Register as Client</div>
-                                <div style={S.regSub}>Request and track devices</div>
+                                <div style={S.regTitle}>Register as Applicant</div>
+                                <div style={S.regSub}>Apply for indigent services</div>
                             </div>
                             <IoArrowForward size={16} color={C.accent} />
                         </button>

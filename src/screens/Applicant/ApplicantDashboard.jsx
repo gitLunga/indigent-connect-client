@@ -1,6 +1,6 @@
-// screens/Client/ClientDashboard.jsx
-// Redesigned dashboard:
-//  - Browse Devices → navigates to /device-catalog
+// screens/Applicant/ApplicantDashboard.jsx
+// Dashboard:
+//  - Submit Application → calls applicationAPI.submitApplication directly (no device/plan selection)
 //  - My Applications / See All → navigates to /my-applications
 //  - Notifications bell → navigates to /notifications
 //  - Profile completion reminder stays until profile done
@@ -9,7 +9,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { deviceAPI, notificationAPI } from '../../services/api';
+import { applicationAPI, notificationAPI } from '../../services/api';
 import { useToast } from '../../components/ToastProvider';
 import ConfirmDialog from '../../components/ConfirmDialog';
 import { Sk, SkeletonShimmerStyle } from '../../components/SkeletonLoader';
@@ -21,15 +21,14 @@ import {
     IoNotificationsOutline,
     IoPersonAddOutline,
     IoChevronForward,
-    IoPhonePortraitOutline,
     IoListOutline,
     IoRefreshOutline,
     IoGridOutline,
-    IoAlertCircleOutline,
     IoCheckmarkCircle,
     IoTime,
     IoArrowForward,
     IoShieldCheckmarkOutline,
+    IoSendOutline,
 } from 'react-icons/io5';
 
 const C = {
@@ -53,10 +52,11 @@ const C = {
 };
 
 const STATUS_META = {
-    Approved:  { bg: C.greenSoft, text: C.green, dot: C.green, icon: IoCheckmarkCircle },
-    Pending:   { bg: C.amberSoft, text: C.amber, dot: C.amber, icon: IoTime },
-    Rejected:  { bg: C.roseSoft,  text: C.rose,  dot: C.rose,  icon: IoCloseCircleOutline },
-    Cancelled: { bg: C.slateSoft, text: C.slate, dot: C.slate, icon: IoCloseCircleOutline },
+    Approved:           { bg: C.greenSoft, text: C.green, dot: C.green, icon: IoCheckmarkCircle },
+    Pending:            { bg: C.amberSoft, text: C.amber, dot: C.amber, icon: IoTime },
+    Pending_Assessment: { bg: C.amberSoft, text: C.amber, dot: C.amber, icon: IoTime },
+    Rejected:           { bg: C.roseSoft,  text: C.rose,  dot: C.rose,  icon: IoCloseCircleOutline },
+    Cancelled:          { bg: C.slateSoft, text: C.slate, dot: C.slate, icon: IoCloseCircleOutline },
 };
 
 const StatusChip = ({ status }) => {
@@ -64,12 +64,12 @@ const StatusChip = ({ status }) => {
     return (
         <div style={{ display: 'flex', alignItems: 'center', padding: '4px 10px', borderRadius: 20, backgroundColor: m.bg }}>
             <div style={{ width: 5, height: 5, borderRadius: 3, marginRight: 5, backgroundColor: m.dot }} />
-            <span style={{ fontSize: 11, fontWeight: '700', color: m.text }}>{status}</span>
+            <span style={{ fontSize: 11, fontWeight: '700', color: m.text }}>{status === 'Pending_Assessment' ? 'In Assessment' : status}</span>
         </div>
     );
 };
 
-export default function ClientDashboard() {
+export default function ApplicantDashboard() {
     const toast    = useToast();
     const navigate = useNavigate();
 
@@ -83,6 +83,7 @@ export default function ClientDashboard() {
     const [eligibilityLoading, setEligibilityLoading] = useState(false);
     const [unreadCount,        setUnreadCount]        = useState(0);
     const [dialog,             setDialog]             = useState(null);
+    const [submitting,         setSubmitting]         = useState(false);
 
     useEffect(() => { loadData(); }, []);
 
@@ -93,12 +94,12 @@ export default function ClientDashboard() {
             const u = JSON.parse(ud);
             setUser(u);
             checkProfile(u);
-            if (u.registration_status === 'Verified') {
+            if (u.registration_status === 'Verified' || u.registration_status === 'Profile_Completed') {
                 await Promise.all([
-                    checkEligibility(u.client_user_id),
-                    loadApplications(u.client_user_id),
-                    loadSummary(u.client_user_id),
-                    loadUnreadCount(u.client_user_id),
+                    checkEligibility(u.applicant_id),
+                    loadApplications(u.applicant_id),
+                    loadSummary(u.applicant_id),
+                    loadUnreadCount(u.applicant_id),
                 ]);
             }
         } catch (e) { console.error(e); }
@@ -107,13 +108,13 @@ export default function ClientDashboard() {
 
     const checkProfile = (u) => {
         const s = u.registration_status || '';
-        setHasProfile(s === 'Verified' || s === 'Profile_Completed' || !!(u.network_provider && u.contract_duration_months));
+        setHasProfile(s === 'Verified' || s === 'Profile_Completed');
     };
 
     const checkEligibility = async (id) => {
         try {
             setEligibilityLoading(true);
-            const r = await deviceAPI.checkEligibility(id);
+            const r = await applicationAPI.checkEligibility(id);
             const raw = r?.data;
             const eligible =
                 raw?.data?.eligibility?.eligible ??
@@ -127,7 +128,7 @@ export default function ClientDashboard() {
 
     const loadApplications = async (id) => {
         try {
-            const r = await deviceAPI.getUserApplications(id);
+            const r = await applicationAPI.getUserApplications(id);
             const raw = r?.data?.data;
             let list = [];
             if (Array.isArray(raw))                       list = raw;
@@ -139,14 +140,14 @@ export default function ClientDashboard() {
 
     const loadSummary = async (id) => {
         try {
-            const r = await deviceAPI.getApplicationSummary(id);
+            const r = await applicationAPI.getApplicationSummary(id);
             setSummary(r.data.data?.summary || null);
         } catch { setSummary(null); }
     };
 
     const loadUnreadCount = async (id) => {
         try {
-            const r = await notificationAPI.getUnreadCount(id, 'Client');
+            const r = await notificationAPI.getUnreadCount(id, 'Applicant');
             if (r.data.success) setUnreadCount(r.data.unreadCount || 0);
         } catch { /* silent */ }
     };
@@ -155,6 +156,31 @@ export default function ClientDashboard() {
         setRefreshing(true);
         await loadData();
         setRefreshing(false);
+    };
+
+    const submitApplication = async () => {
+        if (!user?.applicant_id) return;
+        setSubmitting(true);
+        try {
+            const r = await applicationAPI.submitApplication(user.applicant_id);
+            toast.success('Application Submitted', r.data?.message || 'Your application has been submitted successfully.');
+            await loadData();
+        } catch (error) {
+            toast.error('Submission Failed', error.response?.data?.message || error.message || 'Please try again.');
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    const handleSubmitClick = () => {
+        setDialog({
+            title: 'Submit Application',
+            message: 'Are you sure you want to submit your indigent registration application for review?',
+            confirmText: 'Yes, Submit',
+            cancelText: 'Not yet',
+            variant: 'success',
+            onConfirm: submitApplication,
+        });
     };
 
     const greeting = () => {
@@ -269,14 +295,14 @@ export default function ClientDashboard() {
                         <div>
                             <h1 style={S.headerTitle}>{greeting()}, {user?.first_name || 'User'} 👋</h1>
                             <p style={S.headerSub}>
-                                {user?.registration_status === 'Verified'
+                                {hasProfile
                                     ? 'Here\'s an overview of your account'
-                                    : 'Complete your profile to unlock device applications'}
+                                    : 'Complete your profile to unlock applications'}
                             </p>
                         </div>
                     </div>
                     <div style={S.headerRight}>
-                        {hasProfile && user?.registration_status === 'Verified' && (
+                        {hasProfile && (
                             <div style={{
                                 display: 'flex', alignItems: 'center',
                                 padding: '5px 10px', borderRadius: 20,
@@ -288,7 +314,7 @@ export default function ClientDashboard() {
                                     : <IoTimeOutline size={13} color="#FCD34D" />
                                 }
                                 <span style={{ fontSize: 11, fontWeight: '700', color: isEligible ? '#34D399' : '#FCD34D', marginLeft: 5 }}>
-                                    {isEligible ? 'Eligible' : eligibilityLoading ? 'Checking…' : 'Pending Eligibility'}
+                                    {isEligible ? 'Eligible' : eligibilityLoading ? 'Checking…' : 'Pending Verification'}
                                 </span>
                             </div>
                         )}
@@ -317,7 +343,7 @@ export default function ClientDashboard() {
                                 </div>
                                 <div>
                                     <div style={S.profileBannerTitle}>Complete your profile to get started</div>
-                                    <div style={S.profileBannerSub}>Upload your documents to unlock device applications.</div>
+                                    <div style={S.profileBannerSub}>Upload your documents to unlock applications.</div>
                                 </div>
                             </div>
                             <IoChevronForward size={18} color={C.amber} />
@@ -406,12 +432,12 @@ export default function ClientDashboard() {
                                             >
                                                 <div style={S.recentLeft}>
                                                     <div style={S.recentIco}>
-                                                        <IoPhonePortraitOutline size={15} color={C.accent} />
+                                                        <IoDocumentTextOutline size={15} color={C.accent} />
                                                     </div>
                                                     <div style={{ flex: 1, minWidth: 0 }}>
-                                                        <div style={S.recentDevice}>{app.device_name}</div>
+                                                        <div style={S.recentAppLabel}>Application #{app.application_id}</div>
                                                         <div style={S.recentMeta}>
-                                                            {app.model} · {new Date(app.submission_date).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                                            Submitted {new Date(app.submission_date).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -433,8 +459,10 @@ export default function ClientDashboard() {
                                             <IoDocumentTextOutline size={26} color={C.mutedLight} />
                                         </div>
                                         <div style={S.emptyTitle}>No applications yet</div>
-                                        <div style={S.emptySub}>Browse available devices and submit your first application.</div>
-                                        <button style={S.emptyBtn} onClick={() => navigate('/device-catalog')}>Browse Devices</button>
+                                        <div style={S.emptySub}>Submit your indigent registration application to get started.</div>
+                                        <button style={S.emptyBtn} onClick={handleSubmitClick} disabled={submitting}>
+                                            {submitting ? 'Submitting…' : 'Submit Application'}
+                                        </button>
                                     </div>
                                 </div>
                             )}
@@ -510,15 +538,16 @@ export default function ClientDashboard() {
                                     </div>
                                     <div style={{ fontSize: 12, color: C.muted, textAlign: 'center', lineHeight: 1.5, marginBottom: 12 }}>
                                         {isEligible
-                                            ? 'You can browse and apply for devices.'
+                                            ? 'You can submit your indigent registration application.'
                                             : hasProfile ? 'Your account is pending verification.' : 'Complete your profile to become eligible.'}
                                     </div>
                                     {isEligible && (
                                         <button
                                             style={{ backgroundColor: C.navy, padding: '9px 18px', borderRadius: 10, border: 'none', color: '#fff', fontWeight: '700', fontSize: 13, cursor: 'pointer', width: '100%' }}
-                                            onClick={() => navigate('/device-catalog')}
+                                            onClick={handleSubmitClick}
+                                            disabled={submitting}
                                         >
-                                            Browse Devices
+                                            {submitting ? 'Submitting…' : 'Submit Application'}
                                         </button>
                                     )}
                                 </div>
@@ -534,20 +563,20 @@ export default function ClientDashboard() {
                                         style={{
                                             ...S.actionBtn,
                                             background: 'linear-gradient(135deg, #0F1F3D 0%, #1E3A5F 100%)',
-                                            ...(!hasProfile || !isEligible ? { opacity: 0.55 } : {}),
+                                            ...(!hasProfile || !isEligible || submitting ? { opacity: 0.55 } : {}),
                                         }}
                                         onClick={() => {
                                             if (!hasProfile) navigate('/complete-profile');
                                             else if (!isEligible) toast.warning('Not Eligible', 'Your account is not yet eligible.');
-                                            else navigate('/device-catalog');
+                                            else handleSubmitClick();
                                         }}
                                     >
                                         <div style={{ ...S.actionBtnIco, backgroundColor: 'rgba(255,255,255,0.15)' }}>
-                                            <IoPhonePortraitOutline size={18} color="#fff" />
+                                            <IoSendOutline size={18} color="#fff" />
                                         </div>
                                         <div style={{ flex: 1, textAlign: 'left' }}>
-                                            <div style={S.actionBtnLabel}>Browse Devices</div>
-                                            <div style={S.actionBtnHint}>{!hasProfile ? 'Profile needed' : !isEligible ? 'Pending eligibility' : 'View catalogue'}</div>
+                                            <div style={S.actionBtnLabel}>Submit Application</div>
+                                            <div style={S.actionBtnHint}>{!hasProfile ? 'Profile needed' : !isEligible ? 'Pending verification' : 'Apply now'}</div>
                                         </div>
                                         <IoArrowForward size={14} color="rgba(255,255,255,0.45)" />
                                     </button>
@@ -654,7 +683,7 @@ const S = {
     },
     recentLeft:  { display: 'flex', alignItems: 'center', gap: 12, flex: 1, minWidth: 0, marginRight: 12 },
     recentIco:   { width: 32, height: 32, borderRadius: 8, backgroundColor: C.accentSoft, display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 },
-    recentDevice:{ fontSize: 13, fontWeight: '700', color: C.text, marginBottom: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
+    recentAppLabel:{ fontSize: 13, fontWeight: '700', color: C.text, marginBottom: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
     recentMeta:  { fontSize: 11, color: C.muted },
 
     avatarWrap:  { width: 58, height: 58, borderRadius: 18, background: 'linear-gradient(135deg, #1E4FD8, #3B82F6)', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: 10 },

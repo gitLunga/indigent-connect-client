@@ -1,12 +1,11 @@
 // components/AuthNavbar.jsx
-// Shared navbar for Welcome, About, Login, Register, ClientRegister.
-// Smart tab hiding: hides "Login" on /login, hides "Register" on /register or /client-register, etc.
+// Shared navbar for Welcome, About, Login, Register, ApplicantRegister.
+// Smart tab hiding: hides "Login" on /login, hides "Register" on /register or /applicant-register, etc.
 // Responsive: full links ≥641px, hamburger drawer ≤640px.
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { IoMenuOutline, IoCloseOutline } from 'react-icons/io5';
-import dojLogo from '../assets/images/Department-of-Justice-logo.jpg';
+import { IoMenuOutline, IoCloseOutline, IoHomeOutline } from 'react-icons/io5';
 
 const C = {
     navy: '#0F1F3D', accent: '#1E4FD8', surface: '#FFFFFF',
@@ -29,7 +28,7 @@ export default function PublicNavbar() {
     useEffect(() => { setOpen(false); }, [p]);
 
     const isLogin    = p === '/login';
-    const isRegister = p === '/register' || p === '/client-register';
+    const isRegister = p === '/register' || p === '/applicant-register';
     const isAbout    = p === '/about';
     const isHome     = p === '/';
 
@@ -49,10 +48,10 @@ export default function PublicNavbar() {
                 <div className="anb-inner">
                     {/* Logo */}
                     <button className="anb-logo" onClick={() => go('/')}>
-                        <span className="anb-logo-icon"><img src={dojLogo} alt="DoJ&CD" className="anb-logo-img" /></span>
+                        <span className="anb-logo-icon"><IoHomeOutline size={22} color={C.accent} /></span>
                         <span className="anb-logo-text">
-                            <strong>DOJCD</strong>
-                            <small>Connect</small>
+                            <strong>IndigentConnect</strong>
+                            <small>Registration Portal</small>
                         </span>
                     </button>
 
@@ -122,9 +121,6 @@ const navbarCSS = `
     box-shadow: 0 2px 8px rgba(15,31,61,0.15);
     border: 1px solid #E2E8F2;
     overflow: hidden; flex-shrink: 0;
-  }
-  .anb-logo-img {
-    width: 34px; height: 34px; object-fit: contain; display: block;
   }
   .anb-logo-text {
     display: flex; flex-direction: column; align-items: flex-start; line-height: 1;
