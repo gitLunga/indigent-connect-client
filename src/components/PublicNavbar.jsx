@@ -8,8 +8,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { IoMenuOutline, IoCloseOutline, IoHomeOutline } from 'react-icons/io5';
 
 const C = {
-    navy: '#0F1F3D', accent: '#1E4FD8', surface: '#FFFFFF',
-    border: '#E2E8F2', muted: '#64748B',
+    navy: '#ef0c0c', accent: '#af2323', surface: '#FFFFFF',
+    border: '#af2323', muted: '#64748B',
 };
 const NAVBAR_H = 64;
 

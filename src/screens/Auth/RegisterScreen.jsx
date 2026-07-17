@@ -17,13 +17,13 @@ import {
 } from 'react-icons/io5';
 
 const C = {
-    navy:       '#0F1F3D',
-    accent:     '#1E4FD8',
+    navy:       '#ef0c0c',
+    accent:     '#af2323',
     accentSoft: '#EBF0FF',
     surface:    '#FFFFFF',
     bg:         '#F4F6FA',
     border:     '#E2E8F2',
-    text:       '#0F1F3D',
+    text:       '#9e1414',
     muted:      '#64748B',
     mutedLight: '#94A3B8',
     green:      '#059669',
@@ -172,7 +172,7 @@ export default function RegisterScreen() {
 const S = {
     root: { minHeight: '100vh', backgroundColor: C.bg, display: 'flex', flexDirection: 'column' },
 
-    banner:        { background: 'linear-gradient(135deg, #0D1B35 0%, #0F1F3D 100%)', padding: '28px 24px 22px', position: 'relative', overflow: 'hidden' },
+    banner:        { background: 'linear-gradient(135deg, #ef0c0c 0%, #af2323 100%)', padding: '28px 24px 22px', position: 'relative', overflow: 'hidden' },
     bannerRing:    { position: 'absolute', width: 300, height: 300, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.04)', top: -100, right: -80 },
     bannerContent: { display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20, maxWidth: 680, margin: '0 auto 20px' },
     emblem:        { width: 58, height: 58, borderRadius: 16, backgroundColor: '#fff', border: '1px solid rgba(255,255,255,0.2)', display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0, boxShadow: '0 4px 14px rgba(0,0,0,0.25)', overflow: 'hidden' },

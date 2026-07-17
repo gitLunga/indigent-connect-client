@@ -28,13 +28,13 @@ import {
 } from 'react-icons/io5';
 
 const C = {
-    navy:       '#0F1F3D',
-    accent:     '#1E4FD8',
+    navy:       '#ef0c0c',
+    accent:     '#af2323',
     accentSoft: '#EBF0FF',
     surface:    '#FFFFFF',
     bg:         '#F4F6FA',
     border:     '#E2E8F2',
-    text:       '#0F1F3D',
+    text:       '#9e1414',
     muted:      '#64748B',
     mutedLight: '#94A3B8',
     green:      '#059669',
@@ -437,7 +437,7 @@ export default function ApplicantRegisterScreen() {
 }
 
 const headerStyles = {
-    wrap:      { background: 'linear-gradient(135deg, #0D1B35 0%, #0F1F3D 100%)', paddingTop: 16, paddingBottom: 18, paddingLeft: 24, paddingRight: 24, position: 'relative', overflow: 'hidden' },
+    wrap:      { background: 'linear-gradient(135deg, #ef0c0c 0%, #af2323 100%)', paddingTop: 16, paddingBottom: 18, paddingLeft: 24, paddingRight: 24, position: 'relative', overflow: 'hidden' },
     ring:      { position: 'absolute', width: 300, height: 300, borderRadius: 150, border: '1px solid rgba(255,255,255,0.04)', top: -100, right: -80 },
     backBtn:   { width: 40, height: 40, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', flexShrink: 0, transition: 'background 0.15s' },
     titleRow:  { display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20, maxWidth: 640, margin: '0 auto 20px' },
@@ -469,7 +469,7 @@ const stepContentStyles = {
 const navStyles = {
     row:          { display: 'flex', gap: 12, marginBottom: 16, maxWidth: 640, margin: '0 auto 16px' },
     back:         { flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, padding: '15px 0', borderRadius: 16, border: `1.5px solid ${C.navy}`, backgroundColor: C.surface, cursor: 'pointer', fontWeight: '700', color: C.navy },
-    next:         { flex: 2, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, background: 'linear-gradient(135deg, #0F1F3D 0%, #1E3A5F 100%)', padding: '16px 0', borderRadius: 16, boxShadow: '0 5px 16px rgba(15,31,61,0.3)', cursor: 'pointer', color: '#fff', fontWeight: '700', border: 'none', transition: 'opacity 0.15s' },
+    next:         { flex: 2, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, background: 'linear-gradient(135deg, #ef0c0c 0%, #af2323 100%)', padding: '16px 0', borderRadius: 16, boxShadow: '0 5px 16px rgba(15,31,61,0.3)', cursor: 'pointer', color: '#fff', fontWeight: '700', border: 'none', transition: 'opacity 0.15s' },
     nextFull:     { flex: 1 },
     submit:       { flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10, backgroundColor: C.green, padding: '16px 0', borderRadius: 16, boxShadow: '0 5px 10px rgba(5,150,105,0.25)', cursor: 'pointer', color: '#fff', fontWeight: '700', border: 'none' },
     submitLoading:{ backgroundColor: C.disabled, boxShadow: 'none', cursor: 'not-allowed' },

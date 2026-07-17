@@ -22,13 +22,14 @@ import {
     IoTimeOutline,
     IoArrowDownOutline,
     IoAccessibilityOutline,
+    IoChevronForward,
 } from 'react-icons/io5';
 
 // ─── Design tokens ──────────────────────────────────────────────────────────
 const C = {
-    navy:       '#0F1F3D',
-    navyLight:  '#162C4A',
-    accent:     '#1E4FD8',
+    navy:       '#ef0c0c',
+    navyLight:  '#af2323',
+    accent:     '#af2323',
     accentSoft: '#EBF0FF',
     surface:    '#FFFFFF',
     bg:         '#F4F6FA',
@@ -90,6 +91,15 @@ const USER_TYPES = [
     { icon: IoAccessibilityOutline,   color: '#059669', bg: '#D1FAE5', title: 'Pensioners & People with Disabilities', desc: 'Applicants relying on a state grant or disability income.' },
     { icon: IoPeopleOutline,          color: '#7C3AED', bg: '#EDE9FE', title: 'Unemployed Residents',  desc: 'Residents with no or low income who qualify for the indigent subsidy.' },
     { icon: IoServerOutline,          color: '#D97706', bg: '#FEF3C7', title: 'Municipal Staff',       desc: 'Intake clerks and assessment officers who review and approve applications.' },
+];
+
+const FAQS = [
+    'How do I know if I qualify for indigent support?',
+    'What documents do I need to submit with my application?',
+    'How long does it take to process my application?',
+    'Can I apply if I am renting the property?',
+    'What happens if my household income changes after approval?',
+    'How will I be notified of the outcome of my application?',
 ];
 
 const STATS = [
@@ -276,6 +286,21 @@ export default function WelcomeScreen() {
                         })}
                     </div>
                 </div>
+
+                {/* ── Frequently Asked Questions ── */}
+                <section style={S.faqSection}>
+                    <div style={S.sectionBadge}>FAQ</div>
+                    <h2 style={S.sectionTitle}>Frequently Asked Questions</h2>
+                    <div style={S.faqList}>
+                        {FAQS.map((q, idx) => (
+                            <div key={idx} style={S.faqItem}>
+                                <span style={S.faqQuestion}>{q}</span>
+                                <IoChevronForward size={18} style={S.faqArrow} />
+                            </div>
+                        ))}
+                    </div>
+                </section>
+
             </section>
 
             {/* ═══════════════════════════════════════════════════════
@@ -423,7 +448,7 @@ const S = {
     heroBtns: { display: 'flex', flexDirection: 'row', gap: 14, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 44 },
     heroPrimary: {
         display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10,
-        background: 'linear-gradient(135deg, #1E4FD8 0%, #2563EB 100%)',
+        background: 'linear-gradient(135deg, #ef0c0c 0%, #af2323 100%)',
         borderRadius: 16, padding: '17px 28px',
         border: 'none', cursor: 'pointer',
         boxShadow: '0 8px 24px rgba(30,79,216,0.5)',
@@ -528,4 +553,35 @@ const S = {
         maxWidth: 1000, margin: '0 auto',
     },
     eligText: { fontSize: 13, color: 'rgba(255,255,255,0.62)', lineHeight: 1.65 },
+
+
+    // FAQ
+    faqSection: {
+        marginBottom: 50,
+        display: 'center',
+    },
+    faqList: {
+        backgroundColor: C.surface,
+        borderRadius: 16,
+        boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+        overflow: 'hidden',
+    },
+    faqItem: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '18px 24px',
+        borderBottom: `1px solid ${C.border}`,
+        cursor: 'default',
+        transition: 'background 0.1s',
+    },
+    faqQuestion: {
+        fontSize: 16,
+        fontWeight: 500,
+        color: C.text,
+    },
+    faqArrow: {
+        color: C.mutedLight,
+        flexShrink: 0,
+    },
 };

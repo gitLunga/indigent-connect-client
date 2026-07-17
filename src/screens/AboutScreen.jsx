@@ -21,8 +21,8 @@ import {
 } from 'react-icons/io5';
 
 const C = {
-    navy:       '#0F1F3D',
-    accent:     '#1E4FD8',
+    navy:       '#ef0c0c',
+    accent:     '#af2323',
     accentSoft: '#EBF0FF',
     surface:    '#FFFFFF',
     bg:         '#F4F6FA',

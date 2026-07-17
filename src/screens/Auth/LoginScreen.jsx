@@ -20,13 +20,13 @@ import {
 } from 'react-icons/io5';
 
 const C = {
-    navy:       '#0F1F3D',
-    accent:     '#1E4FD8',
+    navy:       '#ef0c0c',
+    accent:     '#af2323',
     accentSoft: '#EBF0FF',
     surface:    '#FFFFFF',
     bg:         '#F4F6FA',
     border:     '#E2E8F2',
-    text:       '#0F1F3D',
+    text:       '#9e1414',
     muted:      '#64748B',
     mutedLight: '#94A3B8',
     error:      '#DC2626',
@@ -231,7 +231,7 @@ export default function LoginScreen() {
 }
 
 const S = {
-    banner: { background: 'linear-gradient(135deg, #0D1B35 0%, #0F1F3D 100%)', padding: '28px 24px', position: 'relative', overflow: 'hidden' },
+    banner: { background: 'linear-gradient(135deg, #ef0c0c 0%, #af2323 100%)', padding: '28px 24px', position: 'relative', overflow: 'hidden' },
     bannerRing1: { position: 'absolute', width: 300, height: 300, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.05)', top: -100, right: -80 },
     bannerRing2: { position: 'absolute', width: 180, height: 180, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.06)', bottom: -60, left: -60 },
     bannerContent: { maxWidth: 560, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 16, position: 'relative', zIndex: 1, flexWrap: 'wrap' },
@@ -264,7 +264,7 @@ const S = {
     remLabel:  { fontSize: 13, color: C.muted },
     forgotText:{ fontSize: 13, color: C.accent, fontWeight: '600', background: 'none', border: 'none', cursor: 'pointer' },
 
-    submitBtn:     { display: 'flex', justifyContent: 'center', alignItems: 'center', background: 'linear-gradient(135deg, #0F1F3D 0%, #1E3A5F 100%)', borderRadius: 14, padding: '16px', border: 'none', width: '100%', cursor: 'pointer', marginBottom: 24, boxShadow: '0 6px 18px rgba(15,31,61,0.3)', transition: 'opacity 0.15s, transform 0.15s' },
+    submitBtn:     { display: 'flex', justifyContent: 'center', alignItems: 'center', background: 'linear-gradient(135deg, #ef0c0c 0%, #af2323 100%)', borderRadius: 14, padding: '16px', border: 'none', width: '100%', cursor: 'pointer', marginBottom: 24, boxShadow: '0 6px 18px rgba(15,31,61,0.3)', transition: 'opacity 0.15s, transform 0.15s' },
     submitDisabled:{ opacity: 0.6, cursor: 'not-allowed' },
     submitText:    { color: '#fff', fontSize: 15, fontWeight: '700', letterSpacing: '0.2px' },
     spinner:       { width: 18, height: 18, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.8s linear infinite' },

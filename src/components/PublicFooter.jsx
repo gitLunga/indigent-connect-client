@@ -15,9 +15,9 @@ import {
 } from 'react-icons/io5';
 
 const C = {
-    navy:       '#0F1F3D',
-    navyLight:  '#162C4A',
-    accent:     '#1E4FD8',
+    navy:       '#ef0c0c',
+    navyLight:  '#af2323',
+    accent:     '#af2323',
     accentSoft: '#EBF0FF',
     surface:    '#FFFFFF',
     bg:         '#F4F6FA',
@@ -145,7 +145,7 @@ const S = {
 
     // CTA banner
     cta: {
-        background: 'linear-gradient(135deg, #0A1628 0%, #0F1F3D 50%, #162C4A 100%)',
+        background: 'linear-gradient(135deg, #ef0c0c 0%, #af2323 100%)',
         padding: '60px 24px',
         position: 'relative',
         overflow: 'hidden',
@@ -158,7 +158,7 @@ const S = {
     ctaBtns:  { display: 'flex', justifyContent: 'center', gap: 14, flexWrap: 'wrap' },
     ctaPrimary: {
         display: 'flex', alignItems: 'center', gap: 8,
-        background: 'linear-gradient(135deg, #1E4FD8 0%, #2563EB 100%)',
+        background: 'linear-gradient(135deg, #ef0c0c 0%, #af2323 100%)',
         padding: '15px 28px', borderRadius: 14,
         border: 'none', cursor: 'pointer',
         boxShadow: '0 6px 20px rgba(30,79,216,0.45)',
